@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="fontawesome-free-6.5.2-web/fontawesome-free-6.5.2-web/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="grid">
+                <nav class="header__navbar">
+                    <ul class="header__navbar-list">
+                        <li class="header__navbar-item header__navbar-item-date">
+                            <script type="text/javascript">
+                                //khai báo  ngày tháng  hiện tại //
+                                d = new Date();
+                                months = new Array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+                                days = new Array("Một", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Mười Hai");
+                                document.write("<br> Thứ ")
+                                document.write(days[d.getDay()] + " , " + d.getDate() + "/" + months[d.getMonth()] + "/" + d.getFullYear());
+                                document.write("<br>");
+                            </script>
+                        </li>
+                    </ul>
+                    <ul class="header__navbar-list">
+                        <li class="header__navbar-item header__navbar-item-img">
+                            <a href="index.html">
+                                <img src="images/Báo mỗi ngày.png" alt="hinh" width="250" height="70">
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="header__navbar-list">
+                        <li class="header__navbar-item">
+                            <div class="search-bar">
+                                <input type="text" id="search-input" placeholder="Nhập từ khóa">
+                                <button type="button" id="search-button">Tìm kiếm</button>
+                            </div>
+                        </li>
+                        <li class="header__navbar-item header__navbar-item--log">Đăng nhập</a>
+                        </li>
+                        <li class="header__navbar-item header__navbar-item--log">Đăng ký</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="menu">
+                    <li>
+                        <a href="index.html"><i class="fas fa-home"></i></a>
+                    </li>
+                    <li>
+                        <a href="">Thời sự</a>
+                    </li>
+                    <li>
+                        <a href="">Thế giới</a>
+                    </li>
+                    <li>
+                        <a href="">Kinh tế</a>
+                    </li>
+                    <li>
+                        <a href="">Văn hóa</a>
+                    </li>
+                    <li>
+                        <a href="">Thể thao</a>
+                    </li>
+                    <li>
+                        <a href="">Giáo dục</a>
+                    </li>
+                    <li>
+                        <a href="">Thêm</a>
+                    </li>
+                </div>
+            </div>
+
+        </header>
+    </div>
+
+
+    <script src="script.js"></script>
+    <!--Modal layout -->
+    <!-- <div class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__body">
+    
+            <div class="auth-form">
+                <div class="auth-form__container">
+                    <div class="auth-form__header">
+                        <h3 class="auth-form__heading">Đăng ký</h3>
+                        <span class="auth-form__switch-btn">Đăng nhập</span>
+                    </div>
+                    <div class="auth-form__form">
+                        <div class="auth-form__group">
+                            <input type="text" class="auth-form__input" placeholder="Tên đăng nhập">
+                        </div>
+                        <div class="auth-form__group">
+                            <input type="password " class="auth-form__input" placeholder="Mật khẩu">
+                        </div>
+                        <div class="auth-form__group">
+                            <input type="password " class="auth-form__input" placeholder="Nhập lại mật khẩu">
+                        </div>
+                    </div>
+                    <div class="auth-form__aside">
+                        <p class="auth-form__poli">
+                            Đồng ý với chúng tôi về
+                            <a href="" class="auth-form__poli-link">Điều khoản dịch vụ</a> &
+                            <a href="" class="auth-form__poli-link">Chính sách bảo mật</a>
+                        </p>
+                    </div>
+                    <div class="autho-form__controls">
+                        <button class="btn">TRỞ LẠI</button>
+                        <button class="btn btn--primary">ĐĂNG KÝ</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="auth-form">
+                <div class="auth-form__container">
+                    <div class="auth-form__header">
+                        <h3 class="auth-form__heading">Đăng nhập</h3>
+                        <span class="auth-form__switch-btn">Đăng ký</span>
+                    </div>
+                    <div class="auth-form__form">
+                        <div class="auth-form__group">
+                            <input type="text" class="auth-form__input" placeholder="Tên đăng nhập">
+                        </div>
+                        <div class="auth-form__group">
+                            <input type="password " class="auth-form__input" placeholder="Mật khẩu">
+                        </div>
+                    </div>
+                    <div class="auth-form__aside">
+                        <div class="auth-form__help">
+                            <a href="" class="auth-form__help-fg">Quên mật khẩu</a>
+                        </div>
+                    </div>
+                    <div class="auth-form__controls">
+                        <button class="btn">TRỞ LẠI</button>
+                        <button class="btn btn--primary">ĐĂNG NHẬP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <footer class="footer">
+        <div class="grid">
+            <div class="grid__row">
+                <div class="grid_column-2-4">
+                    <ul class="footer__list">
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Thời sự</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Thế giới</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Kinh tế</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Đời sống</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="grid_column-2-4">
+                    <ul class="footer__list">
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Sức khỏe</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Giới trẻ</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Giáo dục</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Du lịch</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="grid_column-2-4">
+                    <ul class="footer__list">
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Văn hóa</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Giải trí</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Thể thao</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Công nghệ</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="grid_column-2-4">
+                    <ul class="footer__list">
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Xe</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Thời trang trẻ</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Video</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Podcast</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="grid_column-2-4">
+                    <ul class="footer__list">
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Bạn đọc</a>
+                        </li>
+                        <li class="footer-item">
+                            <a href="" class="footer-item_link">Rao vặt</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="grid__row">
+                <div class="footer-bar">
+                    <ul class="footer-item-logo">
+                        <a href="index.html">
+                            <img src="images/Báo mỗi ngày.png" alt="hinh" width="250" height="70">
+                        </a>
+                    </ul>
+                    <ul class="footer-lienhe">
+                        <li class="footer-lienhe-item">Theo dõi báo trên</li>
+                        <li class="footer-lienhe-item">
+                            <a href="" class="footer-lienhe-item">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        </li>
+                        <li class="footer-lienhe-item">
+                            <a href="" class="footer-lienhe-item">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </li>
+                        <li class="footer-lienhe-item">
+                            <a href="" class="footer-lienhe-item">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

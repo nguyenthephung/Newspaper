@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết bài báo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Website Đọc Báo</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="list.html">Danh sách bài báo</a></li>
+                <li><a href="about.html">Giới thiệu</a></li>
+                <li><a href="contact.html">Liên hệ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="article-detail">
+            <a href="list.html" class="back-button">Quay lại</a>
+
+            <h2>{{ article.title }}</h2>
+            <img src="{{ article.image }}" alt="{{ article.title }}">
+            <div class="article-content">
+                {{ article.content }}
+            </div>
+
+            <p class="author">Tác giả: {{ article.author }}</p>
+            <p class="date">Ngày đăng: {{ article.date }}</p>
+
+            <section class="comments">
+                <h2>Bình luận</h2>
+                <form id="comment-form">
+                    <label for="comment-content">Nội dung bình luận:</label>
+                    <textarea id="comment-content" rows="5"></textarea>
+                    <button type="submit">Gửi bình luận</button>
+                </form>
+
+                <ul id="comments-list">
+                </ul>
+
+                <button id="load-more-button">Xem thêm</button>
+            </section>
+
+            <div class="social-share">
+                <a href="" class="facebook-share">Chia sẻ Facebook</a>
+                <a href="" class="twitter-share">Chia sẻ Twitter</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
