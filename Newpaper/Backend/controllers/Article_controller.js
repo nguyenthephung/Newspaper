@@ -4,6 +4,10 @@ const articleController = {
   create: async (req, res) => {
     try {
       let status = 'pending'; 
+      if(req.user.isAdmin)
+        {
+      status = 'approved';
+        };
       const newArticle = new Article({
         ...req.body,
         author: req.user._id,
@@ -41,6 +45,9 @@ const articleController = {
       if (!article) {
         return res.status(404).json({ message: 'Article not found' });
       }
+      if(!req.user.isAdmin && String(article.author) !== String(req.user.id)){
+        return res.status(403).json({ message: 'You are not authorized to update this article' });
+      }
       if (article.status !== 'approved') {
         return res.status(403).json({ message: 'Article cannot be updated unless it is approved' });
       }
@@ -59,7 +66,9 @@ const articleController = {
       if (!article) {
         return res.status(404).json({ message: 'Article not found' });
       }
-
+      if(!req.user.isAdmin && String(article.author) !== String(req.user.id)){
+        return res.status(403).json({ message: 'You are not authorized to update this article' });
+      }
       if (article.status !== 'approved') {
         return res.status(403).json({ message: 'Article cannot be deleted unless it is approved' });
       }
@@ -76,6 +85,14 @@ const articleController = {
       const { query } = req.query;
       const articles = await Article.find({ $text: { $search: query } });
       res.json(articles);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  },
+  approve: async (req, res) => {
+    try {
+      const updatedArticle = await Article.findByIdAndUpdate(req.params.id, { status: 'approved' }, { new: true });
+      res.json(updatedArticle);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
