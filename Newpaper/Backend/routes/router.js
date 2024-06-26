@@ -6,13 +6,15 @@ const categoryController = require('../controllers/Category_controller');
 const commentController = require('../controllers/Comment_controller');
 const notificationController = require('../controllers/Notification_controller');
 const subscriptionController = require('../controllers/Subscription_controller');
-
+const { verifyToken } = require("../middleware/verifyToken");
 // User routes
 router.post('/users/register', userController.register);
 router.post('/users/login', userController.login);
 router.put('/users/:id', userController.update);
 router.get('/users/:id/preferences', userController.getPreferences);
 router.put('/users/:id/preferences', userController.updatePreferences);
+//REFRESH TOKEN
+router.post("/refresh", userController.requestRefreshToken);
 
 // Article routes
 router.post('/articles', articleController.create);
@@ -42,5 +44,8 @@ router.put('/notifications/:id', notificationController.markAsRead);
 router.post('/subscriptions', subscriptionController.create);
 router.get('/subscriptions', subscriptionController.getByUser);
 router.delete('/subscriptions', subscriptionController.cancel);
+
+//LOG OUT
+router.post("/logout", verifyToken, userController.logOut);
 
 module.exports = router;

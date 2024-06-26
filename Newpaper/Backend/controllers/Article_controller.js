@@ -4,9 +4,6 @@ const articleController = {
   create: async (req, res) => {
     try {
       let status = 'pending'; 
-      if (req.user.role === "admin") {
-        status = 'approved'; 
-      }
       const newArticle = new Article({
         ...req.body,
         author: req.user._id,
