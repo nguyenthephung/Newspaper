@@ -8,12 +8,13 @@ const notificationController = require('../controllers/Notification_controller')
 const subscriptionController = require('../controllers/Subscription_controller');
 const { verifyToken,  verifyTokenAndUserAuthorization, verifyTokenAndAdmin,} = require("../middleware/userVerifyToken");
 // User routes
+router.get('/users/',verifyToken, userController.getAll);
 router.post('/users/register', userController.register);
 router.post('/users/login', userController.login);
 router.put('/users/:id', verifyTokenAndUserAuthorization,userController.update);
-router.delete('users/:id',verifyTokenAndAdmin,userController.delete)
-router.get('/users/:id/preferences', userController.getPreferences);
-router.put('/users/:id/preferences', userController.updatePreferences);
+router.delete('/users/:id',verifyTokenAndAdmin,userController.delete)
+router.get('/users/:id/preferences', verifyToken,userController.getPreferences);
+router.put('/users/:id/preferences', verifyToken ,userController.updatePreferences);
 //REFRESH TOKEN
 router.post("/refresh", userController.requestRefreshToken);
 
