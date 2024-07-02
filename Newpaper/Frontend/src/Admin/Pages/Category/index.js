@@ -9,18 +9,20 @@ const staticCategoriesData = {
       name: "Technology",
       description: "Articles about technology",
       listIdArticle: [
-        { title: "Tech Article 1", description: "Description of Tech Article 1", author: "John Doe" },
-        { title: "Tech Article 2", description: "Description of Tech Article 2", author: "Jane Smith" }
+        { title: "Tech Article 1", description: "Description of Tech Article 1", author: "John Doe", date : "13/02/2021" },
+        { title: "Tech Article 2", description: "Description of Tech Article 2", author: "Jane Smith" , date : "13/02/2021"}
       ],
+      date : "13/02/2021"
     },
     {
       _id: "2",
       name: "Health",
       description: "Articles about health",
       listIdArticle: [
-        { title: "Health Article 1", description: "Description of Health Article 1", author: "Emily Johnson" },
-        { title: "Health Article 2", description: "Description of Health Article 2", author: "Michael Brown" }
+        { title: "Health Article 1", description: "Description of Health Article 1", author: "Emily Johnson" , date : "13/02/2021"},
+        { title: "Health Article 2", description: "Description of Health Article 2", author: "Michael Brown", date : "13/02/2021" }
       ],
+         
     },
   ],
 };
@@ -106,16 +108,17 @@ const Category = () => {
           title: "Articles",
           dataIndex: "listIdArticle",
           render: (articles) => (
-            <ul>
+            <ul style={{ paddingInlineStart: 0 }}>
               {articles.map((article, index) => (
-                <li key={index}>
+                <li key={index} style={{ marginBottom: '15px' }}>
                   <strong>Title:</strong> {article.title} <br />
-                  <strong>Description:</strong> {article.description} <br />
-                  <strong>Author:</strong> {article.author}
+                  <strong>Author:</strong> {article.author}<br />
+                  <strong>Date:</strong> {article.date} 
                 </li>
               ))}
             </ul>
           ),
+          
         },
         {
           title: "Actions",
