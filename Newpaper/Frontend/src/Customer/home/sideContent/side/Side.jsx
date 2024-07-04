@@ -1,7 +1,9 @@
 import React from "react";
 import "./side.css";
+import "../Tpost/Tpost"
 import Heading from "../../../common/heading/Heading";
 import { Link } from "react-router-dom";
+import Tpost from "../Tpost/Tpost";
 
 const Side = () => {
   const categories = [
@@ -33,16 +35,7 @@ const Side = () => {
       </section>
 
       <section className="catgorys">
-        <Heading title="Categories" />
-        <div className="items">
-          {categories.map((category) => (
-            <div key={category._id} className="category category1">
-              <Link to={`/category/${category._id}`} className="hover:text-gray-700">
-                {category.name}
-              </Link>
-            </div>
-          ))}
-        </div>
+       <Tpost/>
       </section>
 
       <Heading title="Subscribe" />

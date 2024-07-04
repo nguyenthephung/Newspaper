@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Head from "./Head";
 import "./header.css";
 import { Link } from "react-router-dom";
-import { Drawer, Switch, Button } from "antd";
-import { MenuOutlined } from '@ant-design/icons';
+import { Drawer, Switch, Button, Menu, Dropdown, Modal } from "antd";
+import { MenuOutlined, DownOutlined } from '@ant-design/icons';
 
 const Header = () => {
   const [navbar, setNavbar] = useState(false);
@@ -22,32 +22,104 @@ const Header = () => {
     adFreeSubscription: false
   });
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const staticTagsData = {
-    tags: [
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  const staticCategoryData = {
+    "categories": [
       {
-        _id: "1",
-        name: "Technology",
-        description: "Articles about technology",
-        listIdArticle: [
-          { title: "Tech Article 1", description: "Description of Tech Article 1", author: "John Doe", date: "13/02/2021" },
-          { title: "Tech Article 2", description: "Description of Tech Article 2", author: "Jane Smith", date: "13/02/2021" }
-        ],
-        date: "13/02/2021"
+        "name": "Thời sự",
+        "tags": [
+          "Chính trị",
+          "Xã hội",
+          "Quốc tế",
+          "Giao thông",
+          "Môi trường"
+        ]
       },
       {
-        _id: "2",
-        name: "Health",
-        description: "Articles about health",
-        listIdArticle: [
-          { title: "Health Article 1", description: "Description of Health Article 1", author: "Emily Johnson", date: "13/02/2021" },
-          { title: "Health Article 2", description: "Description of Health Article 2", author: "Michael Brown", date: "13/02/2021" }
-        ],
+        "name": "Kinh tế",
+        "tags": [
+          "Tài chính",
+          "Chứng khoán",
+          "Bất động sản",
+          "Doanh nghiệp",
+          "Khởi nghiệp"
+        ]
       },
-    ],
+      {
+        "name": "Thể thao",
+        "tags": [
+          "Bóng đá",
+          "Bóng rổ",
+          "Tennis",
+          "Cầu lông",
+          "Điền kinh"
+        ]
+      },
+      {
+        "name": "Văn hóa",
+        "tags": [
+          "Điện ảnh",
+          "Âm nhạc",
+          "Mỹ thuật",
+          "Văn học",
+          "Sân khấu"
+        ]
+      },
+      {
+        "name": "Giải trí",
+        "tags": [
+          "Sao",
+          "Phim ảnh",
+          "TV Show",
+          "Âm nhạc",
+          "Trò chơi"
+        ]
+      },
+      {
+        "name": "Công nghệ",
+        "tags": [
+          "Điện thoại",
+          "Máy tính",
+          "Internet",
+          "AI",
+          "Gadget"
+        ]
+      },
+      {
+        "name": "Sức khỏe",
+        "tags": [
+          "Dinh dưỡng",
+          "Bệnh tật",
+          "Lối sống",
+          "Tập luyện",
+          "Tinh thần"
+        ]
+      },
+      {
+        "name": "Giáo dục",
+        "tags": [
+          "Học đường",
+          "Tuyển sinh",
+          "Du học",
+          "Đào tạo",
+          "Công nghệ giáo dục"
+        ]
+      },
+      {
+        "name": "Du lịch",
+        "tags": [
+          "Điểm đến",
+          "Kinh nghiệm",
+          "Ẩm thực",
+          "Khám phá",
+          "Nghỉ dưỡng"
+        ]
+      }
+    ]
   };
 
   const handleLogout = () => {
-    // Logic đăng xuất
     console.log("User logged out");
   };
 
@@ -63,6 +135,24 @@ const Header = () => {
     setUser({ ...user, adFreeSubscription: !user.adFreeSubscription });
   };
 
+  const categoryMenu = (category) => (
+    <Menu>
+      {category.tags.map((tag, index) => (
+        <Menu.Item key={index}>
+          <Link to={`/tag/${tag}`}>{tag}</Link>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <>
       <Head />
@@ -75,13 +165,19 @@ const Header = () => {
                   Home
                 </Link>
               </li>
-              {staticTagsData.tags.map((tag) => (
-                <li key={tag._id}>
-                  <Link to={`/tag/${tag._id}`} className="hover:text-gray-700">
-                    {tag.name}
-                  </Link>
+              {staticCategoryData.categories.slice(0, 9).map((category, index) => (
+                <li key={index}>
+                    <Link to={`/category/${category.name}`} className="ant-dropdown-link hover:text-gray-700">
+                      {category.name}
+                    </Link>
+               
                 </li>
               ))}
+              <li>
+                <button onClick={openModal} className="hover:text-gray-700">
+                  More
+                </button>
+              </li>
             </ul>
             <div className="relative flex items-center space-x-4">
               {user ? (
@@ -151,6 +247,29 @@ const Header = () => {
           </nav>
         </div>
       </header>
+      <Modal
+  visible={modalVisible}
+  onCancel={closeModal}
+  footer={null}
+  width="80%"
+>
+  <div className="grid grid-cols-6 gap-4">
+    {staticCategoryData.categories.map((category, index) => (
+      <div key={index} className="mb-4">
+        <h3 className="font-bold">
+          <Link to={`/category/${category.name}`}>{category.name}</Link>
+        </h3>
+        <ul className="ml-4 list-disc">
+          {category.tags.map((tag, tagIndex) => (
+            <li key={tagIndex}>
+              <Link to={`/tag/${tag}`}>{tag}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Modal>;
     </>
   );
 };

@@ -8,9 +8,9 @@ const staticCategoriesData = {
       _id: "1",
       name: "Technology",
       description: "Articles about technology",
-      listIdArticle: [
-        { title: "Tech Article 1", description: "Description of Tech Article 1", author: "John Doe", date : "13/02/2021" },
-        { title: "Tech Article 2", description: "Description of Tech Article 2", author: "Jane Smith" , date : "13/02/2021"}
+      listIdTags: [
+        { name: "dsss" },
+        { name: "ddd"}
       ],
       date : "13/02/2021"
     },
@@ -18,9 +18,9 @@ const staticCategoriesData = {
       _id: "2",
       name: "Health",
       description: "Articles about health",
-      listIdArticle: [
-        { title: "Health Article 1", description: "Description of Health Article 1", author: "Emily Johnson" , date : "13/02/2021"},
-        { title: "Health Article 2", description: "Description of Health Article 2", author: "Michael Brown", date : "13/02/2021" }
+      listIdTags: [
+        { name: "dsd"},
+        { name: "đsdd" }
       ],
          
     },
@@ -105,15 +105,13 @@ const Category = () => {
           dataIndex: "name",
         },
         {
-          title: "Articles",
-          dataIndex: "listIdArticle",
-          render: (articles) => (
+          title: "Tags",
+          dataIndex: "listIdTags",
+          render: (tags) => (
             <ul style={{ paddingInlineStart: 0 }}>
-              {articles.map((article, index) => (
+              {tags.map((tags, index) => (
                 <li key={index} style={{ marginBottom: '15px' }}>
-                  <strong>Title:</strong> {article.title} <br />
-                  <strong>Author:</strong> {article.author}<br />
-                  <strong>Date:</strong> {article.date} 
+                  <strong>Tags name</strong> {tags.name} <br />
                 </li>
               ))}
             </ul>

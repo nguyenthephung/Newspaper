@@ -1,50 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Input, Space, Typography, Select,Rate } from 'antd';
+import { Button, Table, Modal, Form, Input, Space, Typography, Select, Rate } from 'antd';
 
 const { Option } = Select;
 
-const categories = [
-  {
-    id: 101,
-    name: "Chính trị"
-  },
-  {
-    id: 102,
-    name: "Khoa học"
-  },
-  {
-    id: 103,
-    name: "Thể thao"
-  },
-  {
-    id: 104,
-    name: "Âm nhạc"
-  },
-  {
-    id: 105,
-    name: "Công nghệ"
-  },
-  {
-    id: 106,
-    name: "Du lịch"
-  },
-  {
-    id: 107,
-    name: "Sức khỏe"
-  }
-];
+const staticCategoryData = {
+  "categories": [
+    {
+      "name": "Thời sự",
+      "tags": [
+        "Chính trị",
+        "Xã hội",
+        "Quốc tế",
+        "Giao thông",
+        "Môi trường"
+      ]
+    },
+    {
+      "name": "Khoa học",
+      "tags": [
+        "Công nghệ",
+        "Khám phá",
+        "Nghiên cứu"
+      ]
+    },
+    // Add more categories as needed
+  ]
+};
 
-const tags = [
-  {
-    id: 201,
-    name: "AI"
-  },
-  {
-    id: 202,
-    name: "Fitness"
-  },
-  // Add more tags as needed
-];
+const getCategories = () => staticCategoryData.categories.map(category => category.name);
+const getTags = (categoryName) => {
+  const category = staticCategoryData.categories.find(cat => cat.name === categoryName);
+  return category ? category.tags : [];
+};
 
 const staticArticlesData = {
   articles: [
@@ -96,6 +83,7 @@ const Article = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [form] = Form.useForm();
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -104,9 +92,11 @@ const Article = () => {
       setLoading(false);
     }, 300);
   }, []);
+
   const calculateAverageRating = (totalRating, ratingCount) => {
     return ratingCount === 0 ? 0 : totalRating / ratingCount;
   };
+
   const handleAdd = () => {
     setEditingArticle(null);
     form.resetFields();
@@ -154,6 +144,11 @@ const Article = () => {
       article.author.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered);
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    form.setFieldsValue({ tags: [] }); // Reset the tags field when category changes
   };
 
   return (
@@ -225,20 +220,22 @@ const Article = () => {
           <Form.Item name="author" label="Author" rules={[{ required: true, message: 'Please input the author!' }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="categories" label="Categories" rules={[{ required: true, message: 'Please select at least one category!' }]}>
-            <Select mode="multiple" style={{ width: '100%' }} placeholder="Select categories">
-              {categories.map(category => (
-                <Option key={category.id} value={category.name}>{category.name}</Option>
+          <Form.Item name="categories" label="Categories" rules={[{ required: true, message: 'Please select a category!' }]}>
+            <Select style={{ width: '100%' }} placeholder="Select categories" onChange={handleCategoryChange}>
+              {getCategories().map(category => (
+                <Option key={category} value={category}>{category}</Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="tags" label="Tags" rules={[{ required: true, message: 'Please select at least one tag!' }]}>
-            <Select mode="multiple" style={{ width: '100%' }} placeholder="Select tags">
-              {tags.map(tag => (
-                <Option key={tag.id} value={tag.name}>{tag.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
+          {selectedCategory && (
+            <Form.Item name="tags" label="Tags" rules={[{ required: true, message: 'Please select at least one tag!' }]}>
+              <Select  style={{ width: '100%' }} placeholder="Select tags">
+                {getTags(selectedCategory).map(tag => (
+                  <Option key={tag} value={tag}>{tag}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
           <Form.List name="content_blocks">
             {(fields, { add, remove }) => (
               <>
