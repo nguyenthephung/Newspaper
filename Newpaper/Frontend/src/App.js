@@ -16,11 +16,15 @@ import Homepages from "./Customer/home/Homepages"
 import Footer from "./Customer/common/footer/Footer"
 import SinglePage from "./Customer/singlePage/SinglePage"
 import Culture from "./Customer/culture/Culture"
+import Login from "./Auth/Login/Login";
+import Register from "./Auth/Register/Register";
 function App() {
   return (
     <div className="App">
   
   <Routes>
+  <Route path="/login" element={ <Login />} />
+  <Route path="/register" element={<Register />} />
       <Route path="/admin" element={
         <div>
           <AdminHeader />
@@ -104,6 +108,20 @@ function App() {
         <div>
           <Header />
          <SinglePage/>
+          <Footer />
+        </div>
+      } />
+      <Route path="/category/:id" element={
+        <div>
+          <Header />
+          <p>dd</p>
+          <Footer />
+        </div>
+      } />
+      <Route path="/tag/:id" element={
+        <div>
+          <Header />
+      <p>dd</p>
           <Footer />
         </div>
       } />

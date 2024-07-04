@@ -1,50 +1,63 @@
-import React from "react"
-import "./side.css"
-import Heading from "../../../common/heading/Heading"
-
+import React from "react";
+import "./side.css";
+import Heading from "../../../common/heading/Heading";
+import { Link } from "react-router-dom";
 
 const Side = () => {
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  }
+  const categories = [
+    {
+      _id: "1",
+      name: "Technology",
+      description: "Articles about technology",
+      listIdArticle: [
+        { title: "Tech Article 1", description: "Description of Tech Article 1", author: "John Doe", date: "13/02/2021" },
+        { title: "Tech Article 2", description: "Description of Tech Article 2", author: "Jane Smith", date: "13/02/2021" }
+      ],
+      date: "13/02/2021"
+    },
+    {
+      _id: "2",
+      name: "Health",
+      description: "Articles about health",
+      listIdArticle: [
+        { title: "Health Article 1", description: "Description of Health Article 1", author: "Emily Johnson", date: "13/02/2021" },
+        { title: "Health Article 2", description: "Description of Health Article 2", author: "Michael Brown", date: "13/02/2021" }
+      ],
+    },
+  ];
 
-  const catgeory = ["world", "travel", "sport", "fun", "health", "fashion", "business", "technology"]
   return (
     <>
-   <section className='banner'>
-        <img src='./images/sidebar-banner-new.jpg' alt='' />
+      <section className="banner">
+        <img src="https://adsngoaitroi.vn/wp-content/uploads/2021/05/quang-cao-ngoai-troi-an-tuong-660x330.jpg" alt="" />
       </section>
 
- 
-      <section className='catgorys'>
-        <Heading title='Catgeorys' />
-        {/*<div className='items'>{allCat}</div>*/}
-        {catgeory.map((val) => {
-          return (
-            <div className='category category1'>
-              <span>{val}</span>
+      <section className="catgorys">
+        <Heading title="Categories" />
+        <div className="items">
+          {categories.map((category) => (
+            <div key={category._id} className="category category1">
+              <Link to={`/category/${category._id}`} className="hover:text-gray-700">
+                {category.name}
+              </Link>
             </div>
-          )
-        })}
+          ))}
+        </div>
       </section>
 
-      <Heading title='Subscribe' />
+      <Heading title="Subscribe" />
 
-<section className='subscribe'>
-  <h1 className='title'>Subscribe to our New Stories</h1>
-  <form action=''>
-    <input type='email' placeholder='Email Address...' />
-    <button>
-      <i className='fa fa-paper-plane'></i> SUBMIT
-    </button>
-  </form>
-</section>
+      <section className="subscribe">
+        <h1 className="title">Subscribe to our New Stories</h1>
+        <form action="">
+          <input type="email" placeholder="Email Address..." />
+          <button>
+            <i className="fa fa-paper-plane"></i> SUBMIT
+          </button>
+        </form>
+      </section>
     </>
-  )
-}
+  );
+};
 
-export default Side
+export default Side;

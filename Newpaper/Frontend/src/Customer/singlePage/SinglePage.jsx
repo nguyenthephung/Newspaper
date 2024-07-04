@@ -6,7 +6,7 @@ import "../home/mainContent/homes/style.css";
 import "./singlepage.css";
 import "../home/sideContent/side/side.css";
 import 'antd/dist/reset.css';
-
+import Suggest from "./suggest/suggest";
 const SinglePage = () => {
   const { id } = useParams();
   const [item, setItem] = useState(null);
@@ -23,6 +23,7 @@ const SinglePage = () => {
       title: "Sample Article",
       authorImg: "author_image_url",
       authorName: "Author Name",
+      categories:"world",
       time: "2024-07-01",
       content_blocks: [
         { type: "paragraph", content: "This is the first paragraph of the article." },
@@ -196,6 +197,9 @@ const SinglePage = () => {
               <Side />
             </section>
           </div>
+          <section>
+              <Suggest category={item.categories}  />
+            </section>
         </main>
       ) : (
         <h1>Not Found</h1>
