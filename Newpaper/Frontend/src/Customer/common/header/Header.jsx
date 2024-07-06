@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Head from "./Head";
 import "./header.css";
 import { Link } from "react-router-dom";
-import { Drawer, Switch, Button, Menu, Dropdown, Modal } from "antd";
-import { MenuOutlined, DownOutlined } from '@ant-design/icons';
+import { Drawer, Switch, Button, Menu, Dropdown, Modal, Input, Form, Select } from "antd";
+import { MenuOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
 
 const Header = () => {
   const [navbar, setNavbar] = useState(false);
@@ -23,6 +25,8 @@ const Header = () => {
   });
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [form] = Form.useForm();
   
   const staticCategoryData = {
     "categories": [
@@ -153,6 +157,34 @@ const Header = () => {
     setModalVisible(false);
   };
 
+  const openEditModal = () => {
+    setEditModalVisible(true);
+    form.setFieldsValue({
+      username: user.username,
+      email: user.email,
+      categories: user.preferences.categories.map(c => c.category)
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditModalVisible(false);
+  };
+
+  const handleUpdateInfo = (values) => {
+    setUser({
+      ...user,
+      username: values.username,
+      email: values.email,
+      preferences: {
+        categories: values.categories.map(category => ({
+          category,
+          topics: []
+        }))
+      }
+    });
+    closeEditModal();
+  };
+
   return (
     <>
       <Head />
@@ -167,10 +199,9 @@ const Header = () => {
               </li>
               {staticCategoryData.categories.slice(0, 9).map((category, index) => (
                 <li key={index}>
-                    <Link to={`/category/${category.name}`} className="ant-dropdown-link hover:text-gray-700">
-                      {category.name}
-                    </Link>
-               
+                  <Link to={`/category/${category.name}`} className="ant-dropdown-link hover:text-gray-700">
+                    {category.name}
+                  </Link>
                 </li>
               ))}
               <li>
@@ -213,6 +244,9 @@ const Header = () => {
                         />
                       </label>
                     </div>
+                    <Button type="primary" className="mt-4" onClick={openEditModal}>
+                      Update Info
+                    </Button>
                     <Button
                       type="primary"
                       danger
@@ -248,28 +282,57 @@ const Header = () => {
         </div>
       </header>
       <Modal
-  visible={modalVisible}
-  onCancel={closeModal}
-  footer={null}
-  width="80%"
->
-  <div className="grid grid-cols-6 gap-4">
-    {staticCategoryData.categories.map((category, index) => (
-      <div key={index} className="mb-4">
-        <h3 className="font-bold">
-          <Link to={`/category/${category.name}`}>{category.name}</Link>
-        </h3>
-        <ul className="ml-4 list-disc">
-          {category.tags.map((tag, tagIndex) => (
-            <li key={tagIndex}>
-              <Link to={`/tag/${tag}`}>{tag}</Link>
-            </li>
+        visible={modalVisible}
+        onCancel={closeModal}
+        footer={null}
+        width="80%"
+      >
+        <div className="grid grid-cols-6 gap-4">
+          {staticCategoryData.categories.map((category, index) => (
+            <div key={index} className="mb-4">
+              <h3 className="font-bold">
+                <Link to={`/category/${category.name}`}>{category.name}</Link>
+              </h3>
+              <ul className="ml-4 list-disc">
+                {category.tags.map((tag, tagIndex) => (
+                  <li key={tagIndex}>
+                    <Link to={`/tag/${tag}`}>{tag}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
-      </div>
-    ))}
-  </div>
-</Modal>;
+        </div>
+      </Modal>
+      <Modal
+        visible={editModalVisible}
+        onCancel={closeEditModal}
+        footer={null}
+        title="Update Info"
+      >
+        <Form form={form} onFinish={handleUpdateInfo}>
+          <Form.Item name="username" label="Username" rules={[{ required: true, message: 'Please input your username!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Please input your email!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="categories" label="Categories" rules={[{ required: true, message: 'Please select your categories!' }]}>
+            <Select mode="multiple">
+              {staticCategoryData.categories.map(category => (
+                <Option key={category.name} value={category.name}>
+                  {category.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 };

@@ -7,6 +7,7 @@ import "./singlepage.css";
 import "../home/sideContent/side/side.css";
 import 'antd/dist/reset.css';
 import Suggest from "./suggest/suggest";
+
 const SinglePage = () => {
   const { id } = useParams();
   const [item, setItem] = useState(null);
@@ -23,13 +24,32 @@ const SinglePage = () => {
       title: "Sample Article",
       authorImg: "author_image_url",
       authorName: "Author Name",
-      categories:"world",
+      categories: "world",
       time: "2024-07-01",
       content_blocks: [
         { type: "paragraph", content: "This is the first paragraph of the article." },
         { type: "image", src: "https://baccara-tokyo.com/wp-content/uploads/2021/04/Eimi-Fukada.2-769x1024.png", alt: "Image caption 1" },
         { type: "paragraph", content: "This is the second paragraph of the article." },
         { type: "image", src: "https://baccara-tokyo.com/wp-content/uploads/2021/04/Eimi-Fukada.2-769x1024.png", alt: "Image caption 2" },
+        { type: "paragraph", content: "This is the third paragraph of the article." },
+        { type: "quote", content: "This is a quote from the article." }
+      ],
+      totalRating: 25, // Example total rating
+      ratingCount: 5 // Example rating count
+    }
+    ,
+    {
+      id: 2,
+      title: "Sample Article",
+      authorImg: "author_image_url",
+      authorName: "Author Name",
+      categories: "world",
+      time: "2024-07-01",
+      content_blocks: [
+        { type: "paragraph", content: "This is the first paragrapAh of the article." },
+        { type: "image", src: "", alt: "Image caption 1" },
+        { type: "paragraph", content: "This is the second paragraph of the article." },
+        { type: "image", src: "", alt: "Image caption 2" },
         { type: "paragraph", content: "This is the third paragraph of the article." },
         { type: "quote", content: "This is a quote from the article." }
       ],
@@ -87,6 +107,24 @@ const SinglePage = () => {
 
   const averageRating = ratingCount > 0 ? totalRating / ratingCount : 0;
 
+  const getShareUrl = (platform) => {
+    const currentUrl = window.location.href;
+    const encodedUrl = encodeURIComponent(currentUrl);
+    const encodedTitle = encodeURIComponent(item.title);
+    const encodedDescription = encodeURIComponent(item.content_blocks[0].content);
+
+    switch (platform) {
+      case 'facebook':
+        return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+      case 'twitter':
+        return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+      case 'instagram':
+        return `https://www.instagram.com/?url=${encodedUrl}`;
+      default:
+        return '#';
+    }
+  };
+
   return (
     <>
       {item ? (
@@ -100,6 +138,21 @@ const SinglePage = () => {
                 <img src={item.authorImg} alt={item.authorName} className="ml-2 w-8 h-8 rounded-full" />
                 <p className="ml-2"> {item.authorName} on</p>
                 <label className="ml-2 text-gray-600">{item.time}</label>
+              </div>
+
+              <div className='social'>
+                <div className='socBox' onClick={() => window.open(getShareUrl('facebook'), '_blank')}>
+                  <i className='fab fa-facebook-f'></i>
+                  <span>SHARE</span>
+                </div>
+                <div className='socBox' onClick={() => window.open(getShareUrl('twitter'), '_blank')}>
+                  <i className='fab fa-twitter'></i>
+                  <span>SHARE</span>
+                </div>
+                <div className='socBox' onClick={() => window.open(getShareUrl('instagram'), '_blank')}>
+                  <i className='fab fa-instagram'></i>
+                  <span>SHARE</span>
+                </div>
               </div>
 
               <div className="content">
@@ -198,8 +251,8 @@ const SinglePage = () => {
             </section>
           </div>
           <section>
-              <Suggest category={item.categories}  />
-            </section>
+            <Suggest category={item.categories} />
+          </section>
         </main>
       ) : (
         <h1>Not Found</h1>

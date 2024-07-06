@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Import Link
 import Slider from "react-slick";
 import Heading from "../../common/heading/Heading";
 import "slick-carousel/slick/slick.css";
@@ -99,7 +100,9 @@ const Suggest = ({ category }) => {
                     </div>
                   </div>
                   <div className="text">
-                    <h1 className="title">{post.title.slice(0, 40)}...</h1>
+                    <h1 className="title">
+                      <Link to={`/SinglePage/${post.id}`}>{post.title.slice(0, 40)}...</Link>
+                    </h1>
                     <div className="date">
                       <i className="fas fa-calendar-days"></i>
                       <label>{post.date}</label>

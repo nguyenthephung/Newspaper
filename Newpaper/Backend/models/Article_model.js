@@ -14,7 +14,7 @@ const articleSchema = new Schema({
     author: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' }, 
     tags: [{ type: Schema.Types.ObjectId, ref: 'Tags' }] ,
-    tags: [String],
+    Comment: [{ type: Schema.Types.ObjectId, ref: 'Comment' }] ,
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
     views: { type: Number, default: 0 }, 
     totalRating: { type: Number, default: 0 },
