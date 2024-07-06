@@ -8,7 +8,7 @@ const Discover = () => {
     <>
       <section className='discover'>
         <div className='container'>
-          <Heading title='Discover' />
+          <Heading title='Hot Tags' />
           <div className='content'>
             {discover.map((val) => {
               return (
