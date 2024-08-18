@@ -1,25 +1,32 @@
 .music .box {
-  margin-bottom: 30px;
-  margin-left: 2px;
+  margin-bottom: 20px; /* Giảm khoảng cách dưới mỗi box */
+  margin-left: 0; /* Loại bỏ margin bên trái */
+  display: flex; /* Sử dụng Flexbox để căn chỉnh hình ảnh và nội dung */
 }
-.music .text {
-  padding: 0 30px;
-}
+
 .music .images {
-  width: 320px;
-  height: 220px;
+  flex: 1; /* Hình ảnh chiếm không gian còn lại */
+  margin-right: 15px; /* Thêm khoảng cách giữa hình ảnh và nội dung */
 }
+
+.music .text {
+  flex: 2; /* Nội dung chiếm không gian nhiều hơn hình ảnh */
+  padding: 0; /* Loại bỏ padding bên trái và bên phải */
+}
+
 .music img {
-  width: 320px;
-  height: 220px;
-  object-fit: cover;
+  width: 100%; /* Đảm bảo hình ảnh chiếm toàn bộ không gian của div chứa */
+  height: auto; /* Tự động điều chỉnh chiều cao theo tỷ lệ của hình ảnh */
+  object-fit: cover; /* Giữ tỷ lệ của hình ảnh trong khung chứa */
 }
+
 .music h1 {
-  font-size: 22px;
+  font-size: 20px; /* Điều chỉnh kích thước tiêu đề cho phù hợp */
+  margin-bottom: 10px; /* Thêm khoảng cách dưới tiêu đề */
 }
+
 @media screen and (max-width: 768px) {
-  .music img,
-  .music .images {
-    height: 350px;
+  .music img {
+    height: auto; /* Điều chỉnh chiều cao hình ảnh cho màn hình nhỏ */
   }
 }

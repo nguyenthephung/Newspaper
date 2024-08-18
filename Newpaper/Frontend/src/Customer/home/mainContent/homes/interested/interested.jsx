@@ -1,11 +1,59 @@
-import React from "react"
-import "./interested.css"
-import Slider from "react-slick"
-import {Link} from "react-router-dom"
-import Heading from "../../../../common/heading/Heading"
-import { popular } from "../../../../../dummyData"
+import React from "react";
+import Slider from "react-slick";
+import { Link } from "react-router-dom";
+import Heading from "../../../../common/heading/Heading";
+import "./interested.css";
 
-const interested = () => {
+// Dữ liệu mẫu
+const popular = [
+  {
+    _id: "sampleId123",
+    title: "Sample Article Title 1",
+    content_blocks: [
+      { type: "paragraph", content: "This is a sample paragraph." },
+      { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+      { type: "quote", content: "This is a sample quote." }
+    ],
+    author: "Sample Author 1",
+    category: { name: "fun" }, // Cập nhật category để lọc theo "fun"
+    totalRating: 10,
+    ratingCount: 5,
+    views: 150,
+    createdAt: "2024-08-17T00:00:00Z"
+  },
+  {
+    _id: "sampleId124",
+    title: "Sample Article Title 2",
+    content_blocks: [
+      { type: "paragraph", content: "This is a sample paragraph." },
+      { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+      { type: "quote", content: "This is a sample quote." }
+    ],
+    author: "Sample Author 2",
+    category: { name: "fun" }, // Cập nhật category để lọc theo "fun"
+    totalRating: 20,
+    ratingCount: 10,
+    views: 250,
+    createdAt: "2024-08-18T00:00:00Z"
+  },
+  {
+    _id: "sampleId125",
+    title: "Sample Article Title 3",
+    content_blocks: [
+      { type: "paragraph", content: "This is a sample paragraph." },
+      { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+      { type: "quote", content: "This is a sample quote." }
+    ],
+    author: "Sample Author 3",
+    category: { name: "sports" }, // Cập nhật category khác để không được lọc
+    totalRating: 30,
+    ratingCount: 15,
+    views: 300,
+    createdAt: "2024-08-19T00:00:00Z"
+  }
+];
+
+const Interested = () => {
   const settings = {
     dots: true,
     className: "center",
@@ -16,53 +64,58 @@ const interested = () => {
     speed: 500,
     rows: 2,
     slidesPerRow: 1,
-  }
+  };
+
   return (
     <>
       <section className='music'>
-        <Heading title='Maybe you are interested' />
+        <Heading title='Có thể bạn quan tâm' />
         <div className='content'>
           <Slider {...settings}>
             {popular
-              .filter((val) => val.catgeory === "fun")
+              .filter((val) => val.category.name === "fun") // Lọc theo category
               .map((val) => {
                 return (
-                  <div className='items'>
+                  <div className='items' key={val._id}>
                     <div className='box shadow flexSB'>
                       <div className='images'>
-                        <div className='img'>
-                          <img src={val.cover} alt='' />
-                        </div>
-                        <div class='category category1'>
-                          <span>{val.catgeory}</span>
+                        {/* Hiển thị hình ảnh từ content_blocks */}
+                        {val.content_blocks
+                          .filter(block => block.type === 'image')
+                          .map((block, index) => (
+                            <div className='img' key={index}>
+                              <img src={block.src} alt={block.alt} />
+                            </div>
+                        ))}
+                        <div className='category category1'>
+                          <span>{val.category.name}</span>
                         </div>
                       </div>
                       <div className='text'>
-                        
                         <h1 className='title'>
-                        <Link to={`/SinglePage/${val.id}`}>{val.title.slice(0, 40)}...</Link> 
-                          </h1>
+                          <Link to={`/SinglePage/${val._id}`}>{val.title.slice(0, 40)}...</Link>
+                        </h1>
                         <div className='date'>
-                          <i class='fas fa-calendar-days'></i>
-                          <label>{val.date}</label>
+                          <i className='fas fa-calendar-days'></i>
+                          <label>{new Date(val.createdAt).toLocaleDateString()}</label>
                         </div>
-                        <p className='desc'>{val.desc.slice(0, 250)}...</p>
+                        <p className='desc'>{val.content_blocks.find(block => block.type === 'paragraph')?.content.slice(0, 250)}...</p>
                         <div className='comment'>
-                          <i class='fas fa-share'></i>
+                          <i className='fas fa-share'></i>
                           <label>Share / </label>
-                          <i class='fas fa-comments'></i>
-                          <label>{val.comments}</label>
+                          <i className='fas fa-comments'></i>
+                          <label>{val.ratingCount}</label>
                         </div>
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
           </Slider>
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default interested
+export default Interested;
