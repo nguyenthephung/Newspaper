@@ -32,6 +32,11 @@ const ArticleForm = () => {
         setContentBlocks([...contentBlocks, { type, content: '' }]);
     };
 
+    const handleDeleteContentBlock = (index) => {
+        const newBlocks = contentBlocks.filter((_, i) => i !== index);
+        setContentBlocks(newBlocks);
+    };
+
     const handleSaveDraft = () => {
         // Logic to save the draft (e.g., call an API to save the draft)
         console.log('Draft saved');
@@ -105,6 +110,9 @@ const ArticleForm = () => {
                                 setContentBlocks(newBlocks);
                             }}
                         />
+                        <button onClick={() => handleDeleteContentBlock(index)} className="delete-button">
+                            Xóa
+                        </button>
                     </div>
                 ))}
             </div>

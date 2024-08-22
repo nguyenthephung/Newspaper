@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Modal, Form, Input, Button, Select } from 'antd';
+import { HomeOutlined } from '@ant-design/icons'; // Import biểu tượng Home
 import './UserInfo.css';
 
 const { Option } = Select;
@@ -84,6 +85,9 @@ const UserInfo = () => {
 
     return (
         <div className="user-info">
+            <Link to="/" className="home-link">
+                <HomeOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
+            </Link>
             <p className="user-email">Username: {user.username}</p>
             <p className="user-detail">Email: {user.email}</p>
             <p className="user-detail">Danh mục yêu thích: 

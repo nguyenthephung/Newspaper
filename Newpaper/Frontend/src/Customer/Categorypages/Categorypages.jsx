@@ -4,7 +4,9 @@ import './Category.css';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import Side from "../home/sideContent/side/Side";
+import "../home/mainContent/homes/style.css";
+import "../home/sideContent/side/side.css";
 // Dữ liệu bài viết giả lập
 const articles = [
   {
@@ -225,40 +227,45 @@ const Popular = ({ tag }) => {
 
   return (
     <section className='popular'>
-      <div className='content'>
-        <Slider {...settings}>
-          {filteredArticles.length > 0 ? (
-            filteredArticles.map((val) => (
-              <div className='items' key={val.id}>
-                <div className='box shadow'>
-                  <div className='images row'>
-                    <div className='img'>
-                      <img src={val.cover} alt='' />
+      <div className='contentWrapper'>
+        <div className='contentMain'>
+          <Slider {...settings}>
+            {filteredArticles.length > 0 ? (
+              filteredArticles.map((val) => (
+                <div className='items' key={val.id}>
+                  <div className='box shadow'>
+                    <div className='images row'>
+                      <div className='img'>
+                        <img src={val.cover} alt='' />
+                      </div>
+                      <div className='category category1'>
+                        <span>{val.tags}  </span>
+                      </div>
                     </div>
-                    <div className='category category1'>
-                      <span>{val.tags} </span>
-                    </div>
-                  </div>
-                  <div className='text row'>
-                    <Link to={`/SinglePage/${val.id}`}>
-                      <h1 className='title'>{val.title.slice(0, 40)}...</h1>
-                    </Link>
-                    <div className='date'>
-                      <i className='fas fa-calendar-days'></i>
-                      <label>{val.date}</label>
-                    </div>
-                    <div className='comment'>
-                      <i className='fas fa-comments'></i>
-                      <label>{val.comments}</label>
+                    <div className='text row'>
+                      <Link to={`/SinglePage/${val.id}`}>
+                        <h1 className='title'>{val.title.slice(0, 40)}...</h1>
+                      </Link>
+                      <div className='date'>
+                        <i className='fas fa-calendar-days'></i>
+                        <label>{val.date}</label>
+                      </div>
+                      <div className='comment'>
+                        <i className='fas fa-comments'></i>
+                        <label>{val.comments}</label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div>No articles found for this tag.</div>
-          )}
-        </Slider>
+              ))
+            ) : (
+              <div>No articles found for this tag.</div>
+            )}
+          </Slider>
+        </div>
+        <aside className="sideContent">
+          <Side />
+        </aside>
       </div>
     </section>
   );

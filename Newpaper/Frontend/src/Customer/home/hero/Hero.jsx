@@ -18,6 +18,48 @@ const Hero = () => {
       totalRating: 10,
       ratingCount: 5,
       createdAt: "2024-08-17T00:00:00Z"
+    },
+    {
+      _id: "sampleId123",
+      title: "Sample Article Title",
+      content_blocks: [
+        { type: "paragraph", content: "This is a sample paragraph." },
+        { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+        { type: "quote", content: "This is a sample quote." }
+      ],
+      author: "Sample Author",
+      category: { name: "Sample Category" },
+      totalRating: 10,
+      ratingCount: 5,
+      createdAt: "2024-08-17T00:00:00Z"
+    },
+    {
+      _id: "sampleId123",
+      title: "Sample Article Title",
+      content_blocks: [
+        { type: "paragraph", content: "This is a sample paragraph." },
+        { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+        { type: "quote", content: "This is a sample quote." }
+      ],
+      author: "Sample Author",
+      category: { name: "Sample Category" },
+      totalRating: 10,
+      ratingCount: 5,
+      createdAt: "2024-08-17T00:00:00Z"
+    },
+    {
+      _id: "sampleId123",
+      title: "Sample Article Title",
+      content_blocks: [
+        { type: "paragraph", content: "This is a sample paragraph." },
+        { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
+        { type: "quote", content: "This is a sample quote." }
+      ],
+      author: "Sample Author",
+      category: { name: "Sample Category" },
+      totalRating: 10,
+      ratingCount: 5,
+      createdAt: "2024-08-17T00:00:00Z"
     }
   ];
 

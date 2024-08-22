@@ -4,9 +4,8 @@ import "./header.css";
 import { Link } from "react-router-dom";
 import { Drawer, Switch, Button, Menu, Dropdown, Modal, Input, Form, Select } from "antd";
 import { MenuOutlined } from '@ant-design/icons';
-
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
-
 const Header = () => {
   const [navbar, setNavbar] = useState(false);
   const [user, setUser] = useState({
@@ -122,7 +121,16 @@ const Header = () => {
       }
     ]
   };
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Điều hướng đến trang tìm kiếm với searchQuery
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
   const handleLogout = () => {
     console.log("User logged out");
   };
@@ -204,24 +212,57 @@ const Header = () => {
             <div className="relative flex items-center space-x-4">
               {user ? (
                 <>
-                    <div className="relative text-blue-700">
-   
-    <Link to="/writter" className="ml-1">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-    </Link>
-</div>
-                 
-                 
+<div className="relative text-blue-700 flex items-center">
+        <form onSubmit={handleSearch} className="flex items-center">
+          <input
+            type="text"
+            placeholder="Tìm kiếm bài báo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2"
+          />
+          <button type="submit" className="ml-2 p-2 bg-blue-500 text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 inline-block"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+        </form>
+        <Link to="/writter" className="ml-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 inline-block"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+        </Link>
+      </div>
                 </>
               ) : (
                 <>
                   <Link to="/login" className="navbar-login text-blue-700">
-                    Login
+                    Đăng nhập
                   </Link>
                   <Link to="/register" className="navbar-register text-blue-700">
-                    Register
+                   Đăng ký
                   </Link>
                 </>
               )}
