@@ -40,17 +40,17 @@ const ArticleForm = () => {
     const handleSaveDraft = () => {
         // Logic to save the draft (e.g., call an API to save the draft)
         console.log('Draft saved');
+        window.location.reload();
+        alert('Draft saved successfully!');
     };
 
     const handlePublish = () => {
         // Logic to publish the article (e.g., call an API to publish the article)
         console.log('Article published');
+        window.location.reload();
+        alert('Article published');
     };
 
-    const handleSetPremiere = () => {
-        // Logic to set premiere date (e.g., call an API to set the premiere date)
-        console.log('Premiere date set to:', premiereDate);
-    };
 
     return (
         <div className="article-form">
@@ -116,15 +116,8 @@ const ArticleForm = () => {
                     </div>
                 ))}
             </div>
-            <input
-                type="datetime-local"
-                value={premiereDate}
-                onChange={(e) => setPremiereDate(e.target.value)}
-                className="input-premiere"
-            />
             <button onClick={handleSaveDraft} className="save-draft-button">Save Draft</button>
             <button onClick={handlePublish} className="publish-button">Publish</button>
-            <button onClick={handleSetPremiere} className="set-premiere-button">Set Premiere</button>
         </div>
     );
 };

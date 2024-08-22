@@ -21,6 +21,7 @@ import Register from "./Auth/Register/Register";
 import Writter from "./Writter/Component/ArticleForm"
 import UserInfo from "./Writter/Component/UserInfo";
 import Searchpage from "./Customer/Searchpages/Searchpage";
+import Publish from "./Writter/Component/Publishpage/Publish";
 function App() {
   return (
     <div className="App">
@@ -145,6 +146,13 @@ function App() {
         <div>
           <Header />
          <Searchpage/>
+          <Footer />
+        </div>
+      } />
+        <Route path="/writter/publish" element={
+        <div>
+          <Header />
+         <Publish/>
           <Footer />
         </div>
       } />
