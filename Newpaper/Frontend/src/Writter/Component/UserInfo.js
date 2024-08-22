@@ -99,8 +99,8 @@ const UserInfo = () => {
             </p>
             
             <ul className="user-links">
-                <li><Link to="/writter/publish">Tin đã viết</Link></li>
-                <li><Link to="/writter/draft">Tin nháp</Link></li>
+                <li><Link to="/writer/publish">Tin đã viết</Link></li>
+                <li><Link to="/writer/draft">Tin nháp</Link></li>
             </ul>
             <hr />
             <Button className="update-info" onClick={openEditModal}>Cập Nhật Thông Tin</Button>

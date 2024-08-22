@@ -22,6 +22,7 @@ import Writter from "./Writter/Component/ArticleForm"
 import UserInfo from "./Writter/Component/UserInfo";
 import Searchpage from "./Customer/Searchpages/Searchpage";
 import Publish from "./Writter/Component/Publishpage/Publish";
+import Draft from "./Writter/Component/Draftpage/Draft";
 function App() {
   return (
     <div className="App">
@@ -130,7 +131,7 @@ function App() {
           <Footer />
         </div>
       } />
-        <Route path="/writter" element={
+        <Route path="/writer" element={
         <div>
           <div className="writter" >
           <div className="sidebar">
@@ -149,10 +150,17 @@ function App() {
           <Footer />
         </div>
       } />
-        <Route path="/writter/publish" element={
+        <Route path="/writer/publish" element={
         <div>
           <Header />
          <Publish/>
+          <Footer />
+        </div>
+      } />
+           <Route path="/writer/draft" element={
+        <div>
+          <Header />
+         <Draft/>
           <Footer />
         </div>
       } />

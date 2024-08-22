@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import './ArticleForm.css';
 
 const ArticleForm = () => {
+    const location = useLocation(); // Sử dụng useLocation để lấy dữ liệu từ state
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [category, setCategory] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
     const [contentBlocks, setContentBlocks] = useState([]);
     const [premiereDate, setPremiereDate] = useState('');
+    
     const categories = ['Technology', 'Health', 'Science', 'Politics'];
     const tags = {
         'Technology': ['AI', 'Blockchain', 'Cybersecurity'],
@@ -15,6 +18,17 @@ const ArticleForm = () => {
         'Science': ['Physics', 'Astronomy', 'Biology'],
         'Politics': ['Elections', 'Policy', 'Global Issues'],
     };
+
+    useEffect(() => {
+        if (location.state && location.state.article) {
+            const { title, author, category, selectedTags, content_blocks } = location.state.article;
+            setTitle(title || '');
+            setAuthor(author || '');
+            setCategory(category || '');
+            setSelectedTags(selectedTags || []);
+            setContentBlocks(content_blocks || []);
+        }
+    }, [location.state]);
 
     const handleCategoryChange = (e) => {
         setCategory(e.target.value);
@@ -40,17 +54,14 @@ const ArticleForm = () => {
     const handleSaveDraft = () => {
         // Logic to save the draft (e.g., call an API to save the draft)
         console.log('Draft saved');
-        window.location.reload();
         alert('Draft saved successfully!');
     };
 
     const handlePublish = () => {
         // Logic to publish the article (e.g., call an API to publish the article)
         console.log('Article published');
-        window.location.reload();
         alert('Article published');
     };
-
 
     return (
         <div className="article-form">
@@ -79,7 +90,7 @@ const ArticleForm = () => {
             {category && (
                 <select onChange={handleTagChange} className="input-tags">
                     <option value="">Select Tags</option>
-                    {tags[category]?.map((tag) => (
+                    {(tags[category] || []).map((tag) => (
                         <option key={tag} value={tag}>
                             {tag}
                         </option>
@@ -87,7 +98,7 @@ const ArticleForm = () => {
                 </select>
             )}
             <div className="selected-tags">
-                {selectedTags.map((tag) => (
+                {(selectedTags || []).map((tag) => (
                     <span key={tag} className="tag">
                         {tag}
                     </span>
@@ -99,17 +110,30 @@ const ArticleForm = () => {
                 <button onClick={() => handleContentTypeChange('quote')}>Quote</button>
             </div>
             <div className="content-blocks">
-                {contentBlocks.map((block, index) => (
+                {(contentBlocks || []).map((block, index) => (
                     <div key={index} className="content-block">
                         <label>{block.type}:</label>
-                        <textarea
-                            value={block.content}
-                            onChange={(e) => {
-                                const newBlocks = [...contentBlocks];
-                                newBlocks[index].content = e.target.value;
-                                setContentBlocks(newBlocks);
-                            }}
-                        />
+                        {block.type === 'image' ? (
+                            <input
+                                type="text"
+                                value={block.content}
+                                onChange={(e) => {
+                                    const newBlocks = [...contentBlocks];
+                                    newBlocks[index].content = e.target.value;
+                                    setContentBlocks(newBlocks);
+                                }}
+                                placeholder="Image URL"
+                            />
+                        ) : (
+                            <textarea
+                                value={block.content}
+                                onChange={(e) => {
+                                    const newBlocks = [...contentBlocks];
+                                    newBlocks[index].content = e.target.value;
+                                    setContentBlocks(newBlocks);
+                                }}
+                            />
+                        )}
                         <button onClick={() => handleDeleteContentBlock(index)} className="delete-button">
                             Xóa
                         </button>

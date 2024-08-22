@@ -1,6 +1,7 @@
+// Publish.js
+
 import React, { useState } from "react";
-import Slider from "react-slick";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
 import "./publish.css";
 
@@ -21,67 +22,25 @@ const popular = [
     views: 150,
     createdAt: "2024-08-17T00:00:00Z"
   },
-  {
-    _id: "sampleId124",
-    title: "Sample Article Title 2",
-    content_blocks: [
-      { type: "paragraph", content: "This is a sample paragraph." },
-      { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-      { type: "quote", content: "This is a sample quote." }
-    ],
-    author: "Sample Author 2",
-    category: { name: "fun" },
-    totalRating: 20,
-    ratingCount: 10,
-    views: 250,
-    createdAt: "2024-08-18T00:00:00Z"
-  },
-  {
-    _id: "sampleId125",
-    title: "Sample Article Title 3",
-    content_blocks: [
-      { type: "paragraph", content: "This is a sample paragraph." },
-      { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-      { type: "quote", content: "This is a sample quote." }
-    ],
-    author: "Sample Author 3",
-    category: { name: "sports" },
-    totalRating: 30,
-    ratingCount: 15,
-    views: 300,
-    createdAt: "2024-08-19T00:00:00Z"
-  }
+  // Thêm các bài viết khác nếu cần
 ];
 
 const Publish = () => {
-  const [articles, setArticles] = useState(popular); // Khai báo trạng thái articles
+  const [articles, setArticles] = useState(popular || []);
+  const navigate = useNavigate();
 
   const handleDelete = (id) => {
-    // Xóa bài viết khỏi trạng thái
     setArticles(articles.filter(article => article._id !== id));
-    // Gọi API để xóa bài viết khỏi cơ sở dữ liệu (nếu có)
     console.log(`Article with id ${id} deleted`);
-  };
-
-  const settings = {
-    dots: true,
-    className: "center",
-    centerMode: true,
-    infinite: true,
-    centerPadding: "0",
-    slidesToShow: 1,
-    speed: 500,
-    rows: 2,
-    slidesPerRow: 1,
   };
 
   return (
     <>
       <section className='music'>
-        <Heading title='Công khai' />
+        <Heading title='Báo công khai của bạn' />
         <div className='content'>
-          <Slider {...settings}>
-            {articles.map((val) => (
+          {articles.length > 0 ? (
+            articles.map((val) => (
               <div className='items' key={val._id}>
                 <div className='box shadow flexSB'>
                   <div className='images'>
@@ -111,15 +70,16 @@ const Publish = () => {
                       <i className='fas fa-comments'></i>
                       <label>{val.ratingCount}</label>
                     </div>
-                    {/* Nút xóa */}
                     <button onClick={() => handleDelete(val._id)} className='delete-button'>
                       Xóa
                     </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </Slider>
+            ))
+          ) : (
+            <p>No drafts available</p>
+          )}
         </div>
       </section>
     </>

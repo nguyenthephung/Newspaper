@@ -238,7 +238,7 @@ const Header = () => {
             </svg>
           </button>
         </form>
-        <Link to="/writter" className="ml-2">
+        <Link to="/writer" className="ml-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6 inline-block"
