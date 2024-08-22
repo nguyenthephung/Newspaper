@@ -6,6 +6,7 @@ import { Drawer, Switch, Button, Menu, Dropdown, Modal, Input, Form, Select } fr
 import { MenuOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
+
 const Header = () => {
   const [navbar, setNavbar] = useState(false);
   const [user, setUser] = useState({
@@ -126,11 +127,11 @@ const Header = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Điều hướng đến trang tìm kiếm với searchQuery
     if (searchQuery.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
+
   const handleLogout = () => {
     console.log("User logged out");
   };
@@ -146,7 +147,6 @@ const Header = () => {
   const handleToggleAdFree = () => {
     setUser({ ...user, adFreeSubscription: !user.adFreeSubscription });
   };
-
 
   const openModal = () => {
     setModalVisible(true);
@@ -212,49 +212,51 @@ const Header = () => {
             <div className="relative flex items-center space-x-4">
               {user ? (
                 <>
-<div className="relative text-blue-700 flex items-center">
-        <form onSubmit={handleSearch} className="flex items-center">
-          <input
-            type="text"
-            placeholder="Tìm kiếm bài báo..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2"
-          />
-          <button type="submit" className="ml-2 p-2 bg-blue-500 text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 inline-block"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-        </form>
-        <Link to="/writer" className="ml-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 inline-block"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </Link>
-      </div>
+                  <div className="relative text-blue-700 flex items-center">
+                    <input
+                      type="text"
+                      placeholder="Tìm kiếm bài báo..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="border p-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="ml-2 p-2 bg-blue-500 text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 inline-block"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <Link to="/writer" className="ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 inline-block"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </Link>
                 </>
               ) : (
                 <>
@@ -290,7 +292,7 @@ const Header = () => {
           {staticCategoryData.categories.map((category, index) => (
             <div key={index} className="mb-4">
               <h3 className="font-bold">
-              <Link to={`/${category.name}/${category.tags[0]}`}>{category.name}</Link>
+                <Link to={`/${category.name}/${category.tags[0]}`}>{category.name}</Link>
               </h3>
               <ul className="ml-4 list-disc">
                 {category.tags.map((tag, tagIndex) => (
@@ -303,7 +305,6 @@ const Header = () => {
           ))}
         </div>
       </Modal>
-      
     </>
   );
 };
