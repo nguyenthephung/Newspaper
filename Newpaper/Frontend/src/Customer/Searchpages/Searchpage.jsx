@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Heading from "../common/heading/Heading";
 import "./search.css";
+
 // Dữ liệu mẫu
 const popular = [
   {
@@ -14,7 +15,7 @@ const popular = [
       { type: "quote", content: "This is a sample quote." }
     ],
     author: "Sample Author 1",
-    category: { name: "fun" }, // Cập nhật category để lọc theo "fun"
+    category: { name: "fun" },
     totalRating: 10,
     ratingCount: 5,
     views: 150,
@@ -29,7 +30,7 @@ const popular = [
       { type: "quote", content: "This is a sample quote." }
     ],
     author: "Sample Author 2",
-    category: { name: "fun" }, // Cập nhật category để lọc theo "fun"
+    category: { name: "fun" },
     totalRating: 20,
     ratingCount: 10,
     views: 250,
@@ -44,13 +45,14 @@ const popular = [
       { type: "quote", content: "This is a sample quote." }
     ],
     author: "Sample Author 3",
-    category: { name: "sports" }, // Cập nhật category khác để không được lọc
+    category: { name: "sports" },
     totalRating: 30,
     ratingCount: 15,
     views: 300,
     createdAt: "2024-08-19T00:00:00Z"
   }
 ];
+
 
 const Searchpage = () => {
   const location = useLocation();
@@ -79,15 +81,15 @@ const Searchpage = () => {
     <>
       <section className='music'>
         <Heading title='Tìm kiếm' />
-        <div className='search-bar'>
-          <input
-            type='text'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder='Nhập từ khóa tìm kiếm...'
-          />
-          <button onClick={handleSearch}>Tìm kiếm</button>
-        </div>
+        <div className='search-container'>
+  <input
+    type='text'
+    className='search-input'
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder='Nhập từ khóa tìm kiếm...'
+  />
+</div>
         <div className='content'>
           <Slider {...settings}>
             {popular
