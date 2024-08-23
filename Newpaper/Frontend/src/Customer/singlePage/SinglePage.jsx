@@ -96,27 +96,30 @@ const SinglePage = () => {
     e.preventDefault();
     if (newComment.trim() !== "") {
       try {
-        // Tạo comment mới với dữ liệu tối giản
+        // Tạo comment mới với dữ liệu đầy đủ
         const newCommentData = {
-          article: id,
-          user: userId,
-          username: username,
+          id: comments.length + 1, // ID tạm thời cho comment mới
           content: newComment,
-          time: new Date().toLocaleString()
+          user: username,
+          userId: userId,  // ID của người dùng đã đăng nhập
+          time: new Date().toLocaleString(),
         };
-
-        // Giả định bạn có một API hoặc phương thức Mongoose để lưu comment
-        // const savedComment = await comment.save();
-        // Thay thế phần dưới đây bằng phần API hoặc phương thức lưu trữ của bạn
-        const savedComment = { ...newCommentData, id: comments.length + 1 }; // Giả định lưu thành công và thêm id mới
-
+  
+        // Giả định rằng bạn đã lưu comment thành công
+        // Bạn có thể thay thế phần này bằng API để lưu comment
+        const savedComment = { ...newCommentData };
+  
+        // Cập nhật trạng thái `comments` với comment mới
         setComments([...comments, savedComment]);
+  
+        // Xóa nội dung của trường nhập liệu
         setNewComment("");
       } catch (error) {
         console.error('Error creating comment:', error);
       }
     }
   };
+  
 
   const deleteComment = (commentId) => {
     setComments(comments.filter(comment => comment.id !== commentId));
@@ -267,9 +270,13 @@ const SinglePage = () => {
                 ) : (
                   comments.slice(0, visibleComments).map((comment) => (
                     <div key={comment.id} className="comment my-4 p-4 border-b border-gray-200">
-                      <p className="font-bold">{comment.user}</p>
+                      <p className="font-bold">
+                        {comment.userId === userId ? `Bạn: ${comment.user}` : comment.user}
+                      </p>
                       <p className="text-gray-600">{comment.time}</p>
                       <p className="mt-2">{comment.content}</p>
+                
+                      {/* Hiển thị các nút chỉnh sửa và xóa nếu comment là của người dùng hiện tại */}
                       {comment.userId === userId && (
                         <div className="mt-2 flex space-x-2">
                           <button
