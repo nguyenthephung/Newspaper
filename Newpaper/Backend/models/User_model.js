@@ -23,8 +23,6 @@ const userSchema = new Schema({
   notificationsEnabled: { type: Boolean, default: true },
   bookmarkedArticles: [{ type: Schema.Types.ObjectId, ref: 'Article' }],
   adFreeSubscription: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
