@@ -2,20 +2,18 @@ import { Avatar, Badge, Drawer, List, Space, Typography, Form, Input, Button } f
 import { BellFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../../redux/apiRequest";
 import "./header.css";
 
 function AdminHeader() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [adminInfoVisible, setAdminInfoVisible] = useState(false);
-  const [adminInfo, setAdminInfo] = useState({
-    username: "admin",
-    password: "********",
-    email: "admin@example.com",
-  });
+  const adminInfo = useSelector((state) => state.auth?.login?.currentUser);
   const [comments, setComments] = useState([]);
   const [notifications, setNotifications] = useState([]);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     // Lấy dữ liệu bình luận mới nhất
     axios.get("/api/comments")
@@ -45,11 +43,19 @@ function AdminHeader() {
   };
 
   const handleAdminInfoUpdate = (values) => {
-    // Handle update logic here
-    console.log("Updated admin info:", values);
-    setAdminInfo(values); // Update admin info state
+    // Giả sử adminInfo chứa id và các giá trị khác không thay đổi
+    const updatedValues = {
+      ...adminInfo, // Các giá trị không thay đổi
+      ...values,   // Các giá trị cập nhật từ biểu mẫu
+    };
+  
+    // Gọi hàm updateUser với các giá trị đã kết hợp
+    updateUser(dispatch, updatedValues);
+    
+    console.log("Updated admin info:", updatedValues);
     closeAdminInfoDrawer();
   };
+  
 
   return (
     <div className="AppHeader">

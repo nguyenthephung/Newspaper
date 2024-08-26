@@ -29,6 +29,12 @@ import {
   deleteArticleStart,
   deleteArticleSuccess,
   deleteArticleFailed,
+  getArticlePendingStart,
+  getArticlePendingSuccess,
+  getArticlePendingFailed,
+  updateArticlePendingStart,
+  updateArticlePendingSuccess,
+  updateArticlePendingFailed,
 } from "./articleSlice";
 
 import {
@@ -75,7 +81,7 @@ export const registerUser = async (user, dispatch, navigate) => {
     dispatch(registerFailed());
   }
 };
-export const logOut = async (dispatch, id, navigate, accessToken, axiosJWT) => {
+export const logOut = async (dispatch,navigate, id, accessToken, axiosJWT) => {
   dispatch(logOutStart());
   try {
     await axiosJWT.post("/v1/auth/logout", id, {
@@ -89,23 +95,29 @@ export const logOut = async (dispatch, id, navigate, accessToken, axiosJWT) => {
 };
 
 //User
-export const getAllUsers = async (accessToken, dispatch, axiosJWT) => {
+export const getAllUsers = async (dispatch) => {
   dispatch(getUsersStart());
   try {
-    const res = await axiosJWT.get("/v1/user", {
-      headers: { token: `Bearer ${accessToken}` },
-    });
+    const res = await axios.get("/v1/user");
     dispatch(getUsersSuccess(res.data));
   } catch (err) {
     dispatch(getUsersFailed());
   }
 };
-export const deleteUser = async (accessToken, dispatch, id, axiosJWT) => {
+export const updateUser = async (dispatch,user) =>{
+  dispatch(updateArticleStart());
+  try{
+   const res= await axios.post("/v1/article/updateArticle",user);
+   dispatch(updateArticleSuccess(res.data));
+  }catch(err){
+   dispatch(updateArticleFailed());
+  }
+
+};
+export const deleteUser = async (dispatch, id) => {
   dispatch(deleteUserStart());
   try {
-    const res = await axiosJWT.delete("/v1/user/" + id, {
-      headers: { token: `Bearer ${accessToken}` },
-    });
+    const res = await axios.delete("/v1/user/" + id);
     dispatch(deleteUsersSuccess(res.data));
   } catch (err) {
     dispatch(deleteUserFailed(err.response.data));
@@ -142,6 +154,26 @@ export const deleteArticle = async (dispatch,id,) =>{
    dispatch(deleteArticleFailed());
   }
 };
+export const getArticlePending = async (dispatch) =>{
+  dispatch(getArticlePendingStart());
+  try{
+   const res= await axios.get("/v1/article/getArticlePending");
+   dispatch(getArticlePendingSuccess(res.data));
+  }catch(err){
+   dispatch(getArticlePendingFailed());
+  }
+
+};
+export const updateArticlePending = async (dispatch,id,status) =>{
+ dispatch(updateArticlePendingStart());
+ try{
+  const res= await axios.post("/v1/article/updateArticlePending"+id,status);
+  dispatch(updateArticlePendingSuccess(res.data));
+ }catch(err){
+  dispatch(updateArticlePendingFailed());
+ }
+
+};
 //Category
 export const getCategories = async (dispatch)=>{
   dispatch(getCategoryStart());
@@ -173,7 +205,7 @@ export const deleteCategory = async (dispatch,id,) =>{
 };
 
 //Tags
-export const getTags = async (dispatch) => {
+export const getTag = async (dispatch) => {
   dispatch(getTagStart());
   try {
     const res = await axios.get("/v1/tag/getTag");
