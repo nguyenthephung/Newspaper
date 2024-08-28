@@ -148,7 +148,8 @@
 // export default ArticleForm;
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'; 
-import { updateArticle } from '../../redux/apiRequest';
+import { updateArticle, updateUser } from '../../redux/apiRequest';
+import { updateBookmarkedArticles } from '../../redux/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import './ArticleForm.css';
 
@@ -161,8 +162,9 @@ const ArticleForm = () => {
     const [category, setCategory] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
     const [contentBlocks, setContentBlocks] = useState([]);
-    
+
     const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
+    const user = useSelector((state) => state.auth?.login?.currentUser);
 
     useEffect(() => {
         if (location.state && location.state.article) {
@@ -215,6 +217,24 @@ const ArticleForm = () => {
 
     const handlePublish = () => {
         handleSave(true);
+    };
+
+    // Hàm để cập nhật bookmarkedArticles
+    const handleBookmark = (articleId) => {
+        const updatedUser = {
+            ...user,
+            bookmarkedArticles: [...user.bookmarkedArticles, articleId],
+        };
+        updateUser(dispatch, updatedUser);
+        if (user && user.bookmarkedArticles) {
+            if (!user.bookmarkedArticles.includes(articleId)) {
+                dispatch(updateBookmarkedArticles([articleId]));
+            } else {
+                console.log("This article is already bookmarked.");
+            }
+        } else {
+            console.error("User or bookmarkedArticles not found");
+        }
     };
 
     return (
@@ -296,6 +316,7 @@ const ArticleForm = () => {
             </div>
             <button onClick={handleSaveDraft} className="save-draft-button">Save Draft</button>
             <button onClick={handlePublish} className="publish-button">Publish</button>
+            <button onClick={() => handleBookmark(location.state.article._id)} className="bookmark-button">Bookmark</button>
         </div>
     );
 };

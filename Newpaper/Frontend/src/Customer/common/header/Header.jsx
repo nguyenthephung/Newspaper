@@ -331,34 +331,15 @@ const { Option } = Select;
 const Header = () => {
   const [navbar, setNavbar] = useState(false);
   const dispatch = useDispatch();
-  const [userState, setUserState] = useState({
-    username: "Phung",
-    email: "phung@example.com",
-    preferences: {
-      categories: [
-        {
-          category: "Technology",
-          topics: ["React", "Node.js"]
-        }
-      ]
-    },
-    notificationsEnabled: true,
-    adFreeSubscription: false
-  });
 
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
   const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
-  const user = useSelector((state) => state.auth?.login?.currentUser) || {};
+  const user = useSelector((state) => state.auth?.login?.currentUser);
 
   useEffect(() => {
     getCategories(dispatch);
   }, [dispatch]);
-
-  const [drawerVisible, setDrawerVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -369,22 +350,6 @@ const Header = () => {
     }
   };
 
-  const handleLogout = () => {
-    console.log("User logged out");
-  };
-
-  const toggleDrawer = () => {
-    setDrawerVisible(!drawerVisible);
-  };
-
-  const handleToggleNotifications = () => {
-    setUserState({ ...userState, notificationsEnabled: !userState.notificationsEnabled });
-  };
-
-  const handleToggleAdFree = () => {
-    setUserState({ ...userState, adFreeSubscription: !userState.adFreeSubscription });
-  };
-
   const openModal = () => {
     setModalVisible(true);
   };
@@ -393,33 +358,6 @@ const Header = () => {
     setModalVisible(false);
   };
 
-  const openEditModal = () => {
-    setEditModalVisible(true);
-    form.setFieldsValue({
-      username: userState.username,
-      email: userState.email,
-      categories: userState.preferences.categories.map(c => c.category)
-    });
-  };
-
-  const closeEditModal = () => {
-    setEditModalVisible(false);
-  };
-
-  const handleUpdateInfo = (values) => {
-    setUserState({
-      ...userState,
-      username: values.username,
-      email: values.email,
-      preferences: {
-        categories: values.categories.map(category => ({
-          category,
-          topics: []
-        }))
-      }
-    });
-    closeEditModal();
-  };
 
   return (
     <>
@@ -497,10 +435,39 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="navbar-login text-blue-700">
+                 <div className="relative text-white-700 flex items-center">
+                    <input
+                      type="text"
+                      placeholder="Tìm kiếm bài báo..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="border p-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="ml-2 p-2 bg-blue-500 text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 inline-block"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <Link to="/login" className="navbar-login text-white-700">
                     Đăng nhập
                   </Link>
-                  <Link to="/register" className="navbar-register text-blue-700">
+                  <Link to="/register" className="navbar-registertext-white-700">
                    Đăng ký
                   </Link>
                 </>

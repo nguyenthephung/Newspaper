@@ -203,10 +203,11 @@
 // };
 
 // export default Users;
-import { Button, Checkbox, Form, Input, Modal, Space, Table, Typography } from "antd";
-import React, { useState, useEffect } from 'react';
+import { Button, Checkbox, Form, Input, Modal, Space, Table, Typography, message } from "antd";
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, updateUser, deleteUser } from "../../../redux/apiRequest";
+import debounce from 'lodash/debounce';
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -214,16 +215,30 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const fetchUsers = () => {
+    const fetchUsers = async () => {
       setLoading(true);
-      getAllUsers(dispatch); // Gọi hàm hành động với dispatch
-      setLoading(false);
+      try {
+        await getAllUsers(dispatch);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchUsers();
   }, [dispatch]);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    return users.filter((user) => 
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.socialAccounts?.phoneNumber?.includes(searchTerm)
+    );
+  }, [users, searchTerm]);
 
   const handleAddCustomer = () => {
     setEditingCustomer(null);
@@ -233,37 +248,61 @@ const Users = () => {
 
   const handleEditCustomer = (customer) => {
     setEditingCustomer(customer);
-    form.setFieldsValue(customer || {});
+    form.setFieldsValue({
+      ...customer,
+      phoneNumber: customer.socialAccounts?.phoneNumber
+    });
     setModalVisible(true);
   };
 
   const handleDeleteCustomer = (customerId) => {
     setLoading(true);
-    deleteUser(dispatch, customerId) // Gọi hàm hành động với dispatch
-      .then(() => {
-        return getAllUsers(dispatch); // Refresh the user list after deletion
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    deleteUser(dispatch, customerId)
+      .then(() => getAllUsers(dispatch))
+      .finally(() => setLoading(false));
   };
 
   const handleSaveCustomer = () => {
     form.validateFields().then((values) => {
       setLoading(true);
-      if (editingCustomer) {
-        updateUser(dispatch, { ...editingCustomer, ...values }) // Gọi hàm hành động với dispatch
+      const userData = {
+        ...values,
+        socialAccounts: {
+          phoneNumber: values.phoneNumber
+        }
+      };
+      
+      if (editingCustomer && editingCustomer._id) {
+        // Updating existing user
+        if (!values.password) {
+          delete userData.password; // Remove password if not provided
+        }
+        updateUser({ ...editingCustomer, ...userData })
           .then(() => {
-            return getAllUsers(dispatch); // Refresh the user list after update
+            message.success("User updated successfully");
+            return getAllUsers(dispatch);
+          })
+          .catch((error) => {
+            message.error("Failed to update user: " + error.message);
           })
           .finally(() => {
             setModalVisible(false);
             setLoading(false);
           });
       } else {
-        updateUser(dispatch, values) // Gọi hàm hành động với dispatch
+        // Creating new user
+        if (!values.password) {
+          message.error("Password is required for new users");
+          setLoading(false);
+          return;
+        }
+        updateUser(userData)
           .then(() => {
-            return getAllUsers(dispatch); // Refresh the user list after addition
+            message.success("User created successfully");
+            return getAllUsers(dispatch);
+          })
+          .catch((error) => {
+            message.error("Failed to create user: " + error.message);
           })
           .finally(() => {
             setModalVisible(false);
@@ -273,13 +312,9 @@ const Users = () => {
     });
   };
 
-  const handleSearch = (value) => {
-    const filteredData = users.filter((customer) =>
-      customer?.username?.toLowerCase().includes(value.toLowerCase()) ||
-      customer?.email?.toLowerCase().includes(value.toLowerCase())
-    );
-    setDataSource(filteredData);
-  };
+  const handleSearch = debounce((value) => {
+    setSearchTerm(value);
+  }, 300);
 
   const columns = [
     {
@@ -310,7 +345,7 @@ const Users = () => {
           <Button type="primary" onClick={() => handleEditCustomer(record)}>
             Edit
           </Button>
-          <Button type="danger" onClick={() => handleDeleteCustomer(record.id)}>
+          <Button danger onClick={() => handleDeleteCustomer(record._id)}>
             Delete
           </Button>
         </Space>
@@ -319,25 +354,25 @@ const Users = () => {
   ];
 
   return (
-    <Space size={20} direction="vertical">
+    <Space size={20} direction="vertical" style={{ width: '100%' }}>
       <Typography.Title level={4}>Users</Typography.Title>
-      <Space direction="horizontal">
+      <Space direction="horizontal" style={{ width: '100%', justifyContent: 'space-between' }}>
         <Button type="primary" onClick={handleAddCustomer}>
           Add User
         </Button>
         <Input.Search
-          placeholder="Search users"
-          enterButton
+          placeholder="Search users by username, email or phone"
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 300 }}
         />
       </Space>
       <Table
         loading={loading}
         columns={columns}
-        dataSource={users}
+        dataSource={filteredUsers}
         pagination={{ pageSize: 5 }}
-        rowKey="id"
+        rowKey="_id"
       />
       <Modal
         title={editingCustomer ? "Edit User" : "Add User"}
@@ -352,10 +387,17 @@ const Users = () => {
           <Form.Item name="email" label="Email" rules={[{ required: true, message: "Please enter email" }, { type: "email", message: "Please enter a valid email" }]}>
             <Input />
           </Form.Item>
+          <Form.Item 
+            name="password" 
+            label="Password" 
+            rules={[{ required: !editingCustomer, message: "Please enter password" }]}
+          >
+            <Input.Password placeholder={editingCustomer ? "Leave blank to keep current password" : "Enter password"} />
+          </Form.Item>
           <Form.Item name="isAdmin" valuePropName="checked">
             <Checkbox>Is Admin</Checkbox>
           </Form.Item>
-          <Form.Item name={["socialAccounts", "phoneNumber"]} label="Phone Number">
+          <Form.Item name="phoneNumber" label="Phone Number">
             <Input />
           </Form.Item>
         </Form>
@@ -365,4 +407,3 @@ const Users = () => {
 };
 
 export default Users;
-

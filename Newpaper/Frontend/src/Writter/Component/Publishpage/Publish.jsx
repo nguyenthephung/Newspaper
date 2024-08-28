@@ -97,7 +97,8 @@ import "./publish.css";
 
 
 const Publish = () => {
-  const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+  const [articles, setArticles] = useState(useSelector((state) => state.article?.getArticle?.articles) || []);
+  const user = useSelector((state) => state.auth?.login?.currentUser);
   const dispatch = useDispatch(); 
   const handleDelete = (id) => {
     deleteArticle(dispatch, id).then(() => {
@@ -108,7 +109,10 @@ const Publish = () => {
   };
 
   // Lọc các bài viết đã xuất bản
-  const publishedArticles = articles.filter(article => article.Publish === true);
+  const publishedArticles = articles.filter(article =>
+    article.Publish === true && user.bookmarkedArticles.includes(article._id)
+  );
+
 
   return (
     <>

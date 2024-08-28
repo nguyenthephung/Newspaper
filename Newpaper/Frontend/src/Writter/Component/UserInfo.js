@@ -249,13 +249,18 @@ const UserInfo = () => {
                         label="Categories"
                         rules={[{ required: true, message: 'Please select your categories!' }]}
                     >
-                        <Select mode="multiple" placeholder="Select categories">
-                            {categories && categories.map(category => (
-                                <Option key={category.name} value={category.name}>
-                                    {category.name}
-                                </Option>
-                            ))}
-                        </Select>
+                     <Select 
+    mode="multiple" 
+    placeholder="Select categories" 
+    className="w-full h-12 text-lg"
+>
+    {categories && categories.map(category => (
+        <Option key={category.name} value={category.name}>
+            {category.name}
+        </Option>
+    ))}
+</Select>
+
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">

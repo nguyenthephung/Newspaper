@@ -100,16 +100,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
-import { useDispatch,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteArticle } from "../../../redux/apiRequest";
 import "./draft.css";
 
-// Dữ liệu mẫu
-
 const Draft = () => {
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+  const user = useSelector((state) => state.auth?.login?.currentUser);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
+
   const handleDelete = (id) => {
     deleteArticle(dispatch, id).then(() => {
       // Lọc lại các bài viết sau khi xóa
@@ -122,16 +122,18 @@ const Draft = () => {
     navigate('/writer', { state: { article } });
   };
 
-  // Lọc các bài viết chưa được xuất bản
-  const unpublishedArticles = articles.filter(article => article.Publish === false);
+  // Lọc các bài viết chưa được xuất bản và nằm trong danh sách bookmarkedArticles của user
+  const unpublishedBookmarkedArticles = articles.filter(article =>
+    article.Publish === false && user.bookmarkedArticles.includes(article._id)
+  );
 
   return (
     <>
       <section className='music'>
         <Heading title='Báo nháp của bạn' />
         <div className='content'>
-          {unpublishedArticles.length > 0 ? (
-            unpublishedArticles.map((val) => (
+          {unpublishedBookmarkedArticles.length > 0 ? (
+            unpublishedBookmarkedArticles.map((val) => (
               <div className='items' key={val._id}>
                 <div className='box shadow flexSB'>
                   <div className='images'>

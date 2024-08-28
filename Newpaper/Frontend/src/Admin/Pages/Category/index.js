@@ -149,13 +149,13 @@
 
 // export default Category;
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Input, Space, Typography } from 'antd';
+import { Button, Table, Modal, Form, Input, Space, Typography, message } from 'antd'; // Thêm message vào import
 import { updateCategory, deleteCategory, getCategories } from '../../../redux/apiRequest';
 import { useDispatch, useSelector } from "react-redux";
 
 const Category = () => {
   const dispatch = useDispatch();
-  const categories = useSelector((state) => state.category?.getCategory?.categories) || []; // Xử lý undefined
+  const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -164,11 +164,11 @@ const Category = () => {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    getCategories(dispatch); // Đảm bảo categories được tải về
+    getCategories(dispatch);
   }, [dispatch]);
 
   useEffect(() => {
-    if (categories) {
+    if (categories.length) {
       setLoading(true);
       setTimeout(() => {
         setDataSource(categories);
@@ -179,7 +179,7 @@ const Category = () => {
   }, [categories]);
 
   const handleAdd = () => {
-    setEditingCategory(null);
+    setEditingCategory(null); // Xóa dữ liệu khi bấm vào Add
     setIsModalVisible(true);
   };
 
@@ -189,40 +189,51 @@ const Category = () => {
   };
 
   const handleDelete = async (record) => {
-    if (!record?._id) return; // Kiểm tra undefined
-    const response = await deleteCategory(dispatch, record._id);
-    if (response.success) {
-      const newData = dataSource.filter((category) => category._id !== record._id);
-      setDataSource(newData);
-      setFilteredData(newData);
+    try {
+      await deleteCategory(dispatch, record?._id);
+      message.success("Category deleted successfully");
+      getCategories(dispatch);
+    } catch (error) {
+      message.error("Failed to delete category: " + error.message);
     }
   };
 
   const handleSave = async (values) => {
-    if (editingCategory) {
-      const updatedCategory = {
-        ...editingCategory,
-        name: values.name,
-      };
-      const response = await updateCategory(dispatch, updatedCategory._id, updatedCategory);
-      if (response.success) {
-        const newData = dataSource.map((category) =>
-          category._id === editingCategory._id ? updatedCategory : category
-        );
-        setDataSource(newData);
-        setFilteredData(newData);
+    const categoryData = {
+      ...editingCategory,
+      name: values.name,
+      description: values.description,
+      listIdTags: editingCategory?.listIdTags || [],
+    };
+
+    try {
+      const response = await updateCategory(dispatch, categoryData);
+
+      if (response) {
+        if (editingCategory) {
+          // Cập nhật danh mục hiện có
+          const newData = dataSource.map((category) =>
+            category._id === editingCategory._id ? response : category
+          );
+          setDataSource(newData);
+          setFilteredData(newData);
+        } else {
+          // Thêm danh mục mới
+          const newData = [...dataSource, response];
+          setDataSource(newData);
+          setFilteredData(newData);
+        }
+
+        // Gọi lại getCategories để đảm bảo dữ liệu luôn cập nhật
+        message.success("Category saved successfully");
+        getCategories(dispatch);
       }
-    } else {
-      const newCategory = {
-        _id: (dataSource.length + 1).toString(),
-        name: values.name,
-        description: '',
-        listIdTags: [],
-      };
-      setDataSource([...dataSource, newCategory]);
-      setFilteredData([...dataSource, newCategory]);
+    } catch (error) {
+      message.error("Failed to save category: " + error.message);
+    } finally {
+      setIsModalVisible(false);
+      setLoading(false);
     }
-    setIsModalVisible(false);
   };
 
   const handleSearch = (e) => {
@@ -255,13 +266,17 @@ const Category = () => {
             dataIndex: "name",
           },
           {
+            title: "Description", 
+            dataIndex: "description",
+          },
+          {
             title: "Tags",
             dataIndex: "listIdTags",
             render: (tags) => (
               <ul style={{ paddingInlineStart: 0 }}>
                 {tags?.map((tag, index) => (
                   <li key={index} style={{ marginBottom: '15px' }}>
-                    <strong>Tags name</strong> {tag.name} <br />
+                    <strong>Tags name:</strong> {tag.name} <br />
                   </li>
                 ))}
               </ul>
@@ -286,7 +301,7 @@ const Category = () => {
         footer={null}
       >
         <Form 
-          initialValues={editingCategory || { name: '' }} 
+          initialValues={editingCategory || { name: '', description: '' }} 
           onFinish={handleSave}
         >
           <Form.Item 
@@ -295,6 +310,13 @@ const Category = () => {
             rules={[{ required: true, message: 'Please input the category name!' }]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item 
+            name="description" 
+            label="Description"
+            rules={[{ required: false }]}
+          >
+            <Input.TextArea rows={4} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -308,3 +330,4 @@ const Category = () => {
 };
 
 export default Category;
+
