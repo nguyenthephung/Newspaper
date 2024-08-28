@@ -1,15 +1,27 @@
 const Category = require('../models/Category_model');
-
+const Tag = require('../models/Tag_model');
 const categoryController = {
 
   getAll: async (req, res) => {
     try {
-      const categories = await Category.find();
-      res.json(categories);
+      // Lấy tất cả category và populate tag để lấy name thay vì ObjectId
+      const categories = await Category.find().populate({
+        path: 'tags',
+        select: 'name -_id' // Chỉ chọn name và loại bỏ _id
+      });
+
+      // Chuyển đổi tags từ array ObjectId thành array string chứa tên
+      const categoriesWithTagNames = categories.map(category => ({
+        ...category._doc,
+        tags: category.tags.map(tag => tag.name)
+      }));
+
+      res.json(categoriesWithTagNames);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
   },
+
     updateOrCreate: async (req, res) => {
       try {
         const { _id, name, ...categoryData } = req.body;

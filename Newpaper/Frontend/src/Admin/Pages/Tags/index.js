@@ -197,13 +197,16 @@
 
 // export default Tag;
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Input, Space, Typography, message } from 'antd'; // Thêm message vào import
+import { Button, Table, Modal, Form, Input, Space, Typography, message, Select } from 'antd';
 import { useDispatch, useSelector } from "react-redux";
 import { updateTag, deleteTag, getTag } from '../../../redux/apiRequest';
+
+const { Option } = Select;
 
 const Tag = () => {
   const dispatch = useDispatch();
   const tags = useSelector((state) => state.tag?.getTag?.tags) || [];
+  const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -213,7 +216,7 @@ const Tag = () => {
 
   useEffect(() => {
     setLoading(true);
-    getTag(dispatch).finally(() => setLoading(false)); // Đảm bảo setLoading(false) sau khi getTag hoàn tất
+    getTag(dispatch).finally(() => setLoading(false));
   }, [dispatch]);
 
   useEffect(() => {
@@ -232,7 +235,7 @@ const Tag = () => {
   };
 
   const handleDelete = async (record) => {
-    if (!record?._id) return; // Kiểm tra undefined
+    if (!record?._id) return;
     try {
       await deleteTag(dispatch, record._id);
       message.success("Tag deleted successfully");
@@ -246,29 +249,24 @@ const Tag = () => {
     const tagData = {
       ...editingTag,
       name: values.name,
-      description: values.description || '', // Đảm bảo description không bị undefined
+      description: values.description || '',
+      category: values.category, // Sử dụng tên category
     };
-
+console.log(tagData);
     try {
-      const response = editingTag ? await updateTag(dispatch, tagData) : await updateTag(dispatch, tagData);
+      const response = editingTag 
+        ? await updateTag(dispatch, tagData) 
+        : await updateTag(dispatch, tagData);
 
       if (response) {
-        if (editingTag) {
-          // Cập nhật tag hiện có
-          const newData = dataSource.map((tag) =>
-            tag._id === editingTag._id ? response : tag
-          );
-          setDataSource(newData);
-          setFilteredData(newData);
-        } else {
-          // Thêm tag mới
-          setDataSource([...dataSource, response]);
-          setFilteredData([...dataSource, response]);
-        }
+        const newData = editingTag 
+          ? dataSource.map((tag) => tag._id === editingTag._id ? response : tag) 
+          : [...dataSource, response];
 
-        // Gọi lại getTag để đảm bảo dữ liệu luôn cập nhật
+        setDataSource(newData);
+        setFilteredData(newData);
+
         message.success("Tag saved successfully");
-        getTag(dispatch);
       }
     } catch (error) {
       message.error("Failed to save tag: " + error.message);
@@ -312,6 +310,11 @@ const Tag = () => {
             dataIndex: "description",
           },
           {
+            title: "Category",
+            dataIndex: "category",
+            render: (category) => category|| 'No Category',
+          },
+          {
             title: "Actions",
             render: (text, record) => (
               <Space>
@@ -330,7 +333,7 @@ const Tag = () => {
         footer={null}
       >
         <Form 
-          initialValues={editingTag || { name: '', description: '' }} 
+          initialValues={editingTag || { name: '', description: '', category: null }} 
           onFinish={handleSave}
         >
           <Form.Item 
@@ -347,6 +350,18 @@ const Tag = () => {
           >
             <Input.TextArea rows={4} />
           </Form.Item>
+          <Form.Item 
+            name="category"
+            label="Category"
+            rules={[{ required: true, message: 'Please select a category!' }]}
+          >
+            <Select
+              placeholder="Select a category"
+              style={{ width: '300px' }}
+              options={categories.map(cat => ({ value: cat.name, label: cat.name }))}
+              defaultValue={editingTag?.categoryName}
+            />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save
@@ -359,4 +374,3 @@ const Tag = () => {
 };
 
 export default Tag;
-

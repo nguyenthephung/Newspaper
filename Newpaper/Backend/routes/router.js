@@ -21,9 +21,9 @@ router.post('/user/updateUser', userController.updateOrCreate);
 router.delete('/user/:id',userController.delete)
 
 // Article routes
-// router.get('/article/getArticle', articleController.getAll);
-// router.post('/article/updateArticle',articleController.update);
-// router.delete('/article/:id',verifyToken,articleController.delete);
+router.get('/article/getArticle', articleController.getAll);
+router.post('/article/updateArticle',articleController.update);
+router.delete('/article/:id',articleController.delete);
 // router.get('/article/getArticlePending', articleController.getAll);
 // router.post('/article/updateArticlePending',articleController.update);
 

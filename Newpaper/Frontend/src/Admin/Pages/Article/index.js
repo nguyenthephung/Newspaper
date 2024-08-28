@@ -11,7 +11,7 @@ const Article = () => {
   
   useEffect(() => {
     getArticle(dispatch);
-    getCategories(dispatch); // Ensure categories are fetched
+    getCategories(dispatch);
   }, [dispatch]);
 
   const [loading, setLoading] = useState(false);
@@ -20,17 +20,18 @@ const Article = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [contentBlocks, setContentBlocks] = useState([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
     setLoading(true);
     if(articles){
-    setTimeout(() => {
-      setDataSource(articles);
-      setFilteredData(articles);
-      setLoading(false);
-    }, 300);
-  };
+      setTimeout(() => {
+        setDataSource(articles);
+        setFilteredData(articles);
+        setLoading(false);
+      }, 300);
+    }
   }, [articles]);
 
   const getCategoryNames = () => {
@@ -48,11 +49,13 @@ const Article = () => {
     form.validateFields().then(values => {
       const newArticle = {
         ...values,
-        status: 'pending',
+        content_blocks: contentBlocks,
+        status: 'approved',
         views: 0,
         totalRating: 0,
         ratingCount: 0,
       };
+      console.log(newArticle);
       updateArticle(dispatch, newArticle);
       setIsModalVisible(false);
     });
@@ -61,6 +64,7 @@ const Article = () => {
   const handleEdit = (record) => {
     setEditingArticle(record);
     form.setFieldsValue(record);
+    setContentBlocks(record.content_blocks || []);
     setSelectedCategory(record.categories[0]);
     setIsModalVisible(true);
   };
@@ -70,6 +74,7 @@ const Article = () => {
       const updatedArticle = {
         ...editingArticle,
         ...values,
+        content_blocks: contentBlocks,
       };
       updateArticle(dispatch, updatedArticle);
       setIsModalVisible(false);
@@ -86,6 +91,20 @@ const Article = () => {
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
     form.setFieldsValue({ tags: [] });
+  };
+
+  const addContentBlock = () => {
+    setContentBlocks([...contentBlocks, { type: 'paragraph', content: '' }]);
+  };
+
+  const handleBlockChange = (index, field, value) => {
+    const newBlocks = [...contentBlocks];
+    newBlocks[index][field] = value;
+    setContentBlocks(newBlocks);
+  };
+
+  const removeContentBlock = (index) => {
+    setContentBlocks(contentBlocks.filter((_, i) => i !== index));
   };
 
   return (
@@ -172,7 +191,7 @@ const Article = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            name="categories"
+            name="category"
             label="Category"
             rules={[{ required: true, message: 'Please select a category!' }]}
           >
@@ -199,6 +218,35 @@ const Article = () => {
               </Select>
             </Form.Item>
           )}
+
+          {/* Content Blocks */}
+          {contentBlocks.map((block, index) => (
+            <div key={index} style={{ marginBottom: '16px', border: '1px solid #ddd', padding: '16px', borderRadius: '4px' }}>
+              <Form.Item label="Block Type">
+                <Select
+                  value={block.type}
+                  onChange={(value) => handleBlockChange(index, 'type', value)}
+                >
+                  <Option value="paragraph">Paragraph</Option>
+                  <Option value="image">Image</Option>
+                  <Option value="quote">Quote</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item label={block.type === 'image' ? 'Image URL' : 'Content'}>
+                <Input
+                  value={block.content || block.src}
+                  onChange={(e) => handleBlockChange(index, block.type === 'image' ? 'src' : 'content', e.target.value)}
+                />
+              </Form.Item>
+              <Button type="danger" onClick={() => removeContentBlock(index)}>
+                Remove Block
+              </Button>
+            </div>
+          ))}
+          <Button type="dashed" onClick={addContentBlock} style={{ width: '100%', marginBottom: '16px' }}>
+            Add Content Block
+          </Button>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save
@@ -211,7 +259,6 @@ const Article = () => {
 };
 
 export default Article;
-
 
 
 

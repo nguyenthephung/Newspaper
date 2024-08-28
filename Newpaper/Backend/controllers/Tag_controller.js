@@ -1,5 +1,5 @@
 const Tag = require('../models/Tag_model');
-
+const Category = require('../models/Category_model')
 const tagController = {
 
   getAll: async (req, res) => {
@@ -13,31 +13,36 @@ const tagController = {
 
   updateOrCreate: async (req, res) => {
     try {
-      const { _id, name, ...tagData } = req.body;
-      console.log(req.body);
-
-      // Kiểm tra xem name đã tồn tại hay chưa
-      const existingTag = await Tag.findOne({ name });
-      if (existingTag && existingTag._id.toString() !== _id) {
-        return res.status(400).json({ error: 'Tag name already exists' });
-      }
+      const { _id, name, description, category } = req.body;
 
       let tag;
       if (_id) {
+        // Nếu có ID, tìm kiếm tag trong cơ sở dữ liệu
         tag = await Tag.findById(_id);
-
-        if (tag) {
-          // Cập nhật tag nếu tồn tại
-          tag = await Tag.findByIdAndUpdate(_id, { name, ...tagData }, { new: true, runValidators: true });
-          return res.json({ message: 'Tag updated', tag });
-        }
       }
 
-      // Tạo mới tag nếu không có _id hoặc không tìm thấy trong DB
-      tag = new Tag({ name, ...tagData });
-      await tag.save();
-      res.status(201).json({ message: 'Tag created', tag });
+      if (tag) {
+        // Nếu tìm thấy tag, cập nhật nó
+        tag.name = name;
+        tag.description = description;
+        tag.category = category;
+        await tag.save();
+      } else {
+        // Nếu không tìm thấy tag hoặc không có ID, tạo tag mới
+        tag = new Tag({ name, description, category});
+        await tag.save();
+      }
 
+      // Cập nhật trường tags trong Category
+      const categories = await Category.findOne({ name: category});
+      if (categories) {
+        if (!categories.tags.includes(tag._id)) {
+          categories.tags.push(tag._id);
+        }
+        await categories.save();
+      }
+
+      res.json(tag);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
@@ -45,7 +50,17 @@ const tagController = {
 
   delete: async (req, res) => {
     try {
-      await Tag.findByIdAndDelete(req.params.id);
+      const tagId = req.params.id;
+
+      // Xóa tag
+      await Tag.findByIdAndDelete(tagId);
+
+      // Loại bỏ ObjectId của tag đó khỏi các category liên quan
+      await Category.updateMany(
+        { tags: tagId },
+        { $pull: { tags: tagId } }
+      );
+
       res.json({ message: 'Tag deleted' });
     } catch (err) {
       res.status(400).json({ error: err.message });

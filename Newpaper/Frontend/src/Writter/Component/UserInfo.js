@@ -255,7 +255,7 @@ const UserInfo = () => {
     className="w-full h-12 text-lg"
 >
     {categories && categories.map(category => (
-        <Option key={category.name} value={category.name}>
+        <Option  style={{ width: '300px' }}  key={category.name} value={category.name}>
             {category.name}
         </Option>
     ))}

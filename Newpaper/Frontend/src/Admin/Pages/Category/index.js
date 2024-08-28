@@ -164,17 +164,14 @@ const Category = () => {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    getCategories(dispatch);
+    setLoading(true);
+    getCategories(dispatch).finally(() => setLoading(false)); // Đảm bảo setLoading(false) sau khi getCategories hoàn tất
   }, [dispatch]);
 
   useEffect(() => {
     if (categories.length) {
-      setLoading(true);
-      setTimeout(() => {
-        setDataSource(categories);
-        setFilteredData(categories);
-        setLoading(false);
-      }, 300);
+      setDataSource(categories);
+      setFilteredData(categories);
     }
   }, [categories]);
 
@@ -203,7 +200,7 @@ const Category = () => {
       ...editingCategory,
       name: values.name,
       description: values.description,
-      listIdTags: editingCategory?.listIdTags || [],
+      tags: editingCategory?.tags || [], // Cập nhật tags
     };
 
     try {
@@ -271,12 +268,12 @@ const Category = () => {
           },
           {
             title: "Tags",
-            dataIndex: "listIdTags",
+            dataIndex: "tags", // Cập nhật thành tags
             render: (tags) => (
               <ul style={{ paddingInlineStart: 0 }}>
                 {tags?.map((tag, index) => (
                   <li key={index} style={{ marginBottom: '15px' }}>
-                    <strong>Tags name:</strong> {tag.name} <br />
+                    <strong>Tag:</strong> {tag} <br /> {/* Hiển thị tag */}
                   </li>
                 ))}
               </ul>
@@ -301,7 +298,7 @@ const Category = () => {
         footer={null}
       >
         <Form 
-          initialValues={editingCategory || { name: '', description: '' }} 
+          initialValues={editingCategory || { name: '', description: '', tags: [] }} 
           onFinish={handleSave}
         >
           <Form.Item 
@@ -318,6 +315,13 @@ const Category = () => {
           >
             <Input.TextArea rows={4} />
           </Form.Item>
+          <Form.Item 
+            name="tags"
+            label="Tags"
+            rules={[{ required: false }]}
+          >
+            <Input.TextArea rows={4} placeholder="Tags cannot be edited or added" disabled />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Save
@@ -330,4 +334,3 @@ const Category = () => {
 };
 
 export default Category;
-

@@ -182,12 +182,11 @@ export const getArticle = async (dispatch) =>{
 
 };
 export const updateArticle = async (dispatch,article) =>{
-  dispatch(updateArticleStart());
+
   try{
    const res= await axios.post("/v1/article/updateArticle",article);
-   dispatch(updateArticleSuccess(res.data));
+
   }catch(err){
-   dispatch(updateArticleFailed());
   }
 
 };
