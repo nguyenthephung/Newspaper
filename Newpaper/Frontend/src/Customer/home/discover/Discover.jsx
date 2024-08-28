@@ -6,28 +6,33 @@ import "./style.css";
 // Dữ liệu mẫu về các tags với cover, tag và category
 const discover = [
   {
-    cover: 'https://example.com/tag1.jpg',
+    cover: '/images/Tags/chinhtri.jpg',
     tag: 'Chính trị',
     category: 'Thời sự'
   },
   {
-    cover: 'https://example.com/tag2.jpg',
+    cover: '/images/Tags/suckhoe.jpg',
     tag: 'Sức khỏe',
     category: 'Sức khỏe'
   },
   {
-    cover: 'https://example.com/tag3.jpg',
+    cover: '/images/Tags/khoahoc.jpeg',
     tag: 'Khoa học',
     category: 'Khoa học'
   },
   {
-    cover: 'https://example.com/tag4.jpg',
-    tag: 'Chính trị',
+    cover: '/images/Tags/giaitri.jpg',
+    tag: 'Giải trí',
     category: 'Chính trị'
   },
   {
-    cover: 'https://example.com/tag5.jpg',
+    cover: '/images/Tags/nghethuat.jpg',
     tag: 'Nghệ thuật',
+    category: 'Nghệ thuật'
+  },
+  {
+    cover: '/images/Tags/dulich.jpg',
+    tag: 'Du lịch',
     category: 'Nghệ thuật'
   }
 ];

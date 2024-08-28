@@ -97,26 +97,32 @@
 // export default Draft;
 // Draft.js
 
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteArticle } from "../../../redux/apiRequest";
+import { deleteArticle ,getBookMaked} from "../../../redux/apiRequest";
 import "./draft.css";
 
 const Draft = () => {
-  const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+  const articles = useSelector((state) => state.bookMaked?.getBookMaked?.bookMaked) || [];
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
+  useEffect(() => {
+    if (user) {
+      getBookMaked(dispatch, user._id);
+    }
+  }, [dispatch, user]);
+  
+  // Sửa hàm handleDelete
+const handleDelete = (id) => {
+  deleteArticle(dispatch, id).then(() => {
+    // getBookMaked lại để cập nhật danh sách sau khi xóa
+    getBookMaked(dispatch, user._id);
+  });
+};
 
-  const handleDelete = (id) => {
-    deleteArticle(dispatch, id).then(() => {
-      // Lọc lại các bài viết sau khi xóa
-      const updatedArticles = articles.filter(article => article._id !== id);
-      setArticles(updatedArticles);
-    });
-  };
 
   const handleEdit = (article) => {
     navigate('/writer', { state: { article } });
@@ -124,8 +130,7 @@ const Draft = () => {
 
   // Lọc các bài viết chưa được xuất bản và nằm trong danh sách bookmarkedArticles của user
   const unpublishedBookmarkedArticles = articles.filter(article =>
-    article.Publish === false && user.bookmarkedArticles.includes(article._id)
-  );
+    article.Publish === false );
 
   return (
     <>

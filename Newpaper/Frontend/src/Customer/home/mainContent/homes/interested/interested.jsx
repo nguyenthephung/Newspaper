@@ -132,7 +132,7 @@ const Interested = () => {
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
   // Lọc các bài báo theo category "fun"
-  const funArticles = articles.filter((val) => val.category?.name === "fun");
+  const funArticles = articles.filter((val) => val.category=== "fun");
 
   const settings = {
     dots: true,

@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { updateArticle } from "./apiRequest";
 
 const articleSlice = createSlice({
   name: "article",
@@ -10,26 +9,16 @@ const articleSlice = createSlice({
       error: false,
     },
     updateArticle: {
-      articles: null,
+      article: null,
       loading: false,
       error: false,
     },
     deleteArticle: {
-      articles: null,
+      article: null,
       loading: false,
       error: false,
     },
-    getArticlePending: {
-      articlesPending: [],
-      loading: false,
-      error: false,
-    },
-    updateArticlePending: {
-      articlesPending: null,
-      loading: false,
-      error: false,
-    },
-   
+    
   },
   reducers: {
     getArticleStart: (state) => {
@@ -50,7 +39,7 @@ const articleSlice = createSlice({
     },
     updateArticleSuccess: (state, action) => {
       state.updateArticle.loading = false;
-      state.updateArticle.articles = action.payload;
+      state.updateArticle.article = action.payload;
     },
     updateArticleFailed: (state) => {
       state.updateArticle.loading = false;
@@ -62,35 +51,13 @@ const articleSlice = createSlice({
     },
     deleteArticleSuccess: (state, action) => {
       state.deleteArticle.loading = false;
-      state.deleteArticle.articles = action.payload;
+      state.deleteArticle.article = action.payload;
     },
     deleteArticleFailed: (state) => {
       state.deleteArticle.loading = false;
       state.deleteArticle.error = true;
     },
-
-    getArticlePendingStart: (state) => {
-
-    },
-    getArticlePendingSuccess: (state, action) => {
-      state.getArticlePending.loading = false;
-      state.getArticlePending.articlesPending = action.payload;
-    },
-    getArticlePendingFailed: (state) => {
-      
-    },
-    updateArticlePendingStart: (state) => {
-      state.updateArticlePending.loading = true;
-      state.updateArticlePending.error = false;
-    },
-    updateArticlePendingSuccess: (state, action) => {
-      state.updateArticlePending.loading = false;
-      state.updateArticlePending.articlesPending = action.payload;
-    },
-    updateArticlePendingFailed: (state) => {
-      state.updateArticlePending.loading = false;
-      state.updateArticlePending.error = true;
-    },
+    
   },
 });
 
@@ -104,12 +71,6 @@ export const {
   deleteArticleStart,
   deleteArticleSuccess,
   deleteArticleFailed,
-  getArticlePendingStart,
-  getArticlePendingSuccess,
-  getArticlePendingFailed,
-  updateArticlePendingStart,
-  updateArticlePendingSuccess,
-  updateArticlePendingFailed,
 } = articleSlice.actions;
 
 export default articleSlice.reducer;

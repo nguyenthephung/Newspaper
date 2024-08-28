@@ -88,6 +88,9 @@ const Tpost = () => {
   // Lọc các bài báo có danh mục là "genz"
   const filteredArticles = articles.filter((article) => article.category === "genz");
 
+  // URL hình ảnh dự phòng nếu không có hình ảnh từ bài viết
+  const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
+
   return (
     <>
       <section className="tpost">
@@ -96,20 +99,16 @@ const Tpost = () => {
           filteredArticles.map((val, index) => {
             // Lấy thông tin hình ảnh từ content_blocks
             const imageBlock = val.content_blocks?.find((block) => block.type === "image") || {};
-            const coverImageSrc = imageBlock.src || "";
+            const coverImageSrc = imageBlock.src || fallbackImage;
             const coverImageAlt = imageBlock.alt || "No Image";
 
             return (
               <div className="box flexSB" key={index}>
                 <div className="img">
-                  {coverImageSrc ? (
-                    <img
-                      src={coverImageSrc}
-                      alt={coverImageAlt}
-                    />
-                  ) : (
-                    <p>No image available</p>
-                  )}
+                  <img
+                    src={coverImageSrc}
+                    alt={coverImageAlt}
+                  />
                 </div>
                 <div className="text">
                   <h1 className="title">

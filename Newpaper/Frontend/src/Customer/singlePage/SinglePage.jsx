@@ -14,8 +14,6 @@ const SinglePage = () => {
   const { id } = useParams();
   const [newComment, setNewComment] = useState("");
   const [visibleComments, setVisibleComments] = useState(5);
-  const [userRating, setUserRating] = useState(0);
-
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const article = useSelector((state) => 
@@ -23,24 +21,34 @@ const SinglePage = () => {
       ? state.article.getArticle.articles.find(a => a._id === id) 
       : null
   );
-  
+
   const comments = useSelector((state) => 
     Array.isArray(state.comment?.getComment?.comments) 
       ? state.comment.getComment.comments.filter(c => c.articleId === id) 
       : []
   );
-  
+
   const ratings = useSelector((state) => 
     Array.isArray(state.rating?.getRating?.ratings) 
       ? state.rating.getRating.ratings.filter(r => r.articleId === id) 
       : []
   );
-  
+
+  const userRating = useSelector((state) => {
+    const rating = ratings.find(r => r.userId === user?._id);
+    return rating ? rating.ratingCount : 0;
+  });
+
+  const [currentUserRating, setCurrentUserRating] = useState(userRating);
 
   useEffect(() => {
     getComment(dispatch);
     getRating(dispatch);
   }, [dispatch]);
+
+  useEffect(() => {
+    setCurrentUserRating(userRating);
+  }, [userRating]);
 
   const handleCommentChange = (e) => {
     setNewComment(e.target.value);
@@ -55,21 +63,21 @@ const SinglePage = () => {
         userId: user._id,
         articleId: id,
       };
-      updateComment(dispatch, newCommentData);
+      await updateComment(dispatch, newCommentData);
       setNewComment("");
     }
   };
 
-  const handleDeleteComment = (commentId) => {
-    deleteComment(dispatch, commentId);
+  const handleDeleteComment = async (commentId) => {
+    await deleteComment(dispatch, commentId);
   };
 
-  const handleEditComment = (commentId, updatedContent) => {
+  const handleEditComment = async (commentId, updatedContent) => {
     const updatedComment = {
       _id: commentId,
       content: updatedContent,
     };
-    updateComment(dispatch, updatedComment);
+    await updateComment(dispatch, updatedComment);
   };
 
   const loadMoreComments = () => {
@@ -77,7 +85,7 @@ const SinglePage = () => {
   };
 
   const handleRatingChange = async (value) => {
-    setUserRating(value);
+    setCurrentUserRating(value);
   
     if (!user) {
       alert('You must be logged in to rate this article.');
@@ -85,28 +93,42 @@ const SinglePage = () => {
     }
   
     const existingRating = ratings.find(r => r.userId === user._id);
-    
+  
     if (existingRating) {
-      const updatedRating = { ...existingRating, ratingCount: value };
-      updateRating(dispatch, updatedRating);
+      // Update existing rating
+      const updatedRating = {
+        ...existingRating,
+        ratingCount: value,
+      };
+      await updateRating(dispatch, updatedRating);
     } else {
+      // Create new rating
       const newRating = {
         ratingCount: value,
         articleId: id,
         userId: user._id,
       };
-      updateRating(dispatch, newRating);
+      await updateRating(dispatch, newRating);
     }
-
-    // Update article's total rating and rating count
+  
+    // Calculate the updated total rating and rating count
+    const totalRating = ratings.reduce((sum, r) => sum + r.ratingCount, 0) + (existingRating ? value - existingRating.ratingCount : value);
+    const ratingCount = ratings.length + (existingRating ? 0 : 1);
+  
+    // Update the article with new rating data
     const updatedArticle = {
       ...article,
-      totalRating: article.totalRating + value - (existingRating ? existingRating.ratingCount : 0),
-      ratingCount: existingRating ? article.ratingCount : article.ratingCount + 1,
+      totalRating: totalRating,
+      ratingCount: ratingCount,
     };
-    updateArticle(dispatch, updatedArticle);
+    await updateArticle(dispatch, updatedArticle);
+  
+    // Reflect the new average rating immediately in the UI
+    const newAverageRating = ratingCount > 0 ? totalRating / ratingCount : 0;
+    article.totalRating = totalRating;
+    article.ratingCount = ratingCount;
   };
-
+  
   const averageRating = article?.ratingCount > 0 ? article.totalRating / article.ratingCount : 0;
 
   const getShareUrl = (platform) => {
@@ -189,7 +211,7 @@ const SinglePage = () => {
                 </p>
                 <div className="mt-4">
                   <h3 className="text-lg font-bold mb-2">Rate this article</h3>
-                  <Rate value={userRating} onChange={handleRatingChange} />
+                  <Rate value={currentUserRating} onChange={handleRatingChange} />
                 </div>
               </div>
 
@@ -263,6 +285,7 @@ const SinglePage = () => {
 };
 
 export default SinglePage;
+
 
 /*
 import React, { useEffect, useState } from "react";

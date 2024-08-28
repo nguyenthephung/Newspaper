@@ -3,6 +3,7 @@ import { BellFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser, getComment, getArticlePending } from "../../../redux/apiRequest";
+import { updateUserInfo} from "../../../redux/authSlice"
 import "./header.css";
 
 function AdminHeader() {
@@ -15,9 +16,9 @@ function AdminHeader() {
   const articlesPending = useSelector((state) => state.article?.getArticlePending?.articlesPending) || [];
   const comments = useSelector((state) => state.comment?.getComment?.comments) || [];
 
-  // Lọc những comment và article chưa được đọc
+  // Lọc những comment và bài viết chưa được đọc
   const unreadComments = comments.filter((comment) => !comment.isRead);
-  const unreadNotifications = articlesPending.filter((article) => !article.isRead);
+  const pendingArticles = articlesPending.filter((article) => article.status === 'pending'); // Lọc các bài viết có trạng thái pending
 
   useEffect(() => {
     getComment(dispatch);
@@ -38,6 +39,7 @@ function AdminHeader() {
       ...values,
     };
     updateUser(dispatch, updatedValues);
+    dispatch(updateUserInfo(updatedValues))
     closeAdminInfoDrawer();
   };
 
@@ -62,7 +64,7 @@ function AdminHeader() {
             }}
           />
         </Badge>
-        <Badge count={unreadNotifications.length}>
+        <Badge count={pendingArticles.length}>
           <BellFilled
             style={{ fontSize: 24 }}
             onClick={() => {
@@ -93,7 +95,7 @@ function AdminHeader() {
         maskClosable
       >
         <List
-          dataSource={unreadNotifications}
+          dataSource={pendingArticles}
           renderItem={(item) => (
             <List.Item>
               <Typography.Text strong>{item.author}</Typography.Text>: {item.title} is pending review!

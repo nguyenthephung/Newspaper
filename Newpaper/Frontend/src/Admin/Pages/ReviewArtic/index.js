@@ -211,14 +211,13 @@ const ReviewArticles = () => {
   const [currentArticle, setCurrentArticle] = useState(null);
   
   const users = useSelector((state) => state.user?.users?.allUsers) || [];
-  const articlesPending = useSelector((state) => state.article?.getArticlePending?.articlesPending) || [];
+  const articlesPending = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
 
   useEffect(() => {
     setLoading(true);
     getArticlePending(dispatch);
     setLoading(false);
   }, [dispatch]);
-
   const sendApprovalNotification = (article) => {
     users.forEach((user) => {
       if (user.Subscribe) {
@@ -273,8 +272,8 @@ const ReviewArticles = () => {
           },
           {
             title: "Categories",
-            dataIndex: "categories",
-            render: (categories) => categories.join(", "),
+            dataIndex: "category",
+            render: (category) => category,
           },
           {
             title: "Tags",

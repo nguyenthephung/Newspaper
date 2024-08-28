@@ -178,7 +178,7 @@
 
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Slider from "react-slick";
 import Heading from "../../common/heading/Heading";
 import "slick-carousel/slick/slick.css";
@@ -186,11 +186,16 @@ import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 
 const Suggest = ({ category }) => {
-  // Lấy dữ liệu từ Redux store
-   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+  // Nhận ID từ useParams
+  const { id } = useParams();
 
-  // Lọc và chỉ lấy bài viết theo category
-  const filteredPosts = articles.filter((post) => post.category === category);
+  // Lấy dữ liệu từ Redux store
+  const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+
+  // Lọc bài viết theo category và ID
+  const filteredPosts = articles.filter((post) => 
+    post.category === category && post.id === id
+  );
 
   // Cấu hình của slider
   const settings = {
@@ -217,37 +222,50 @@ const Suggest = ({ category }) => {
     ],
   };
 
+  // URL hình ảnh dự phòng nếu không có hình ảnh từ bài viết
+  const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
+
+  // Đảm bảo category là một chuỗi không rỗng và không phải là undefined
+  const categoryTitle = typeof category === 'string' && category.trim() !== ''
+    ? `${category.charAt(0).toUpperCase() + category.slice(1)} Articles`
+    : "Articles";
+
   return (
     <section className="popularPost life">
-      <Heading title={`${category.charAt(0).toUpperCase() + category.slice(1)} Articles`} />
+      <Heading title={categoryTitle} />
       <div className="content">
         {filteredPosts.length > 0 && (
           <Slider {...settings}>
-            {filteredPosts.map((post) => (
-              <div className="items" key={post.id}>
-                <div className="box shadow">
-                  <div className="images">
-                    <div className="img">
-                      {post.content_blocks.find(block => block.type === "image") && (
-                        <img src={post.content_blocks.find(block => block.type === "image").src} alt={post.content_blocks.find(block => block.type === "image").alt} />
-                      )}
+            {filteredPosts.map((post) => {
+              // Tìm hình ảnh từ content_blocks
+              const imageBlock = post.content_blocks.find(block => block.type === "image");
+              const imageSrc = imageBlock ? imageBlock.src : fallbackImage;
+              const imageAlt = imageBlock ? imageBlock.alt : "No Image";
+
+              return (
+                <div className="items" key={post.id}>
+                  <div className="box shadow">
+                    <div className="images">
+                      <div className="img">
+                        <img src={imageSrc} alt={imageAlt} />
+                      </div>
+                      <div className="category category1">
+                        <span>{post.category}</span>
+                      </div>
                     </div>
-                    <div className="category category1">
-                      <span>{post.category}</span>
-                    </div>
-                  </div>
-                  <div className="text">
-                    <h1 className="title">
-                      <Link to={`/SinglePage/${post.id}`}>{post.title.slice(0, 40)}...</Link>
-                    </h1>
-                    <div className="date">
-                      <i className="fas fa-calendar-days"></i>
-                      <label>{post.date}</label>
+                    <div className="text">
+                      <h1 className="title">
+                        <Link to={`/SinglePage/${post.id}`}>{post.title.slice(0, 40)}...</Link>
+                      </h1>
+                      <div className="date">
+                        <i className="fas fa-calendar-days"></i>
+                        <label>{post.date}</label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Slider>
         )}
       </div>
@@ -256,4 +274,3 @@ const Suggest = ({ category }) => {
 };
 
 export default Suggest;
-

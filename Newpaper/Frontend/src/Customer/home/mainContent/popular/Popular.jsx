@@ -180,7 +180,7 @@ import "./Popular.css";
 
 const Popular = () => {
   // Lấy dữ liệu articles từ Redux store
-  const articles = useSelector((state) => state.article?.articles) || [];
+  const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
   const settings = {
     className: "center",
@@ -217,13 +217,19 @@ const Popular = () => {
               popularArticles.map((val) => {
                 // Lấy thông tin hình ảnh từ content_blocks
                 const coverImage = val.content_blocks?.find((block) => block.type === "image")?.src || "";
+                
+                // Hình ảnh dự phòng nếu không có hình ảnh từ bài viết
+                const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
 
                 return (
                   <div className="items" key={val._id}>
                     <div className="box shadow">
                       <div className="images row">
                         <div className="img">
-                          <img src={coverImage} alt={val.title || "No Title"} />
+                          <img
+                            src={coverImage || fallbackImage}  // Sử dụng hình ảnh dự phòng nếu coverImage không tồn tại
+                            alt={val.title || "No Title"}
+                          />
                         </div>
                         <div className="category category1">
                           <span>{val.category?.name || 'Unknown Category'}</span>

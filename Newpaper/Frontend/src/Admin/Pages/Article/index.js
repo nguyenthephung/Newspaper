@@ -65,7 +65,7 @@ const Article = () => {
     setEditingArticle(record);
     form.setFieldsValue(record);
     setContentBlocks(record.content_blocks || []);
-    setSelectedCategory(record.categories[0]);
+    setSelectedCategory(record.category);
     setIsModalVisible(true);
   };
 
@@ -136,8 +136,8 @@ const Article = () => {
           },
           {
             title: "Category",
-            dataIndex: "categories",
-            render: (categories) => <span>{categories[0]}</span>,
+            dataIndex: "category",
+            render: (category) => <span>{category}</span>,
           },
           {
             title: "Tags",
@@ -211,7 +211,7 @@ const Article = () => {
               label="Tags"
               rules={[{ required: true, message: 'Please select at least one tag!' }]}
             >
-              <Select mode="multiple" style={{ width: '100%' }} placeholder="Select tags">
+              <Select mode="multiple"       style={{ width: '300px' }} placeholder="Select tags">
                 {getTags(selectedCategory).map(tag => (
                   <Option key={tag} value={tag}>{tag}</Option>
                 ))}

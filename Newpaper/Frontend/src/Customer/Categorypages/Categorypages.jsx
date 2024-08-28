@@ -47,7 +47,6 @@ const Navbar = ({ tags, category }) => {
 const Popular = ({ tag, articles }) => {
   // Lọc bài viết theo tag
   const filteredArticles = articles.filter(article => article.tags.includes(tag));
-
   const settings = {
     className: "center",
     centerMode: false,
@@ -97,7 +96,7 @@ const Popular = ({ tag, articles }) => {
                       </div>
                     </div>
                     <div className='text row'>
-                      <Link to={`/SinglePage/${val.id}`}>
+                      <Link to={`/SinglePage/${val._id}`}>
                         <h1 className='title'>{val.title.slice(0, 40)}...</h1>
                       </Link>
                       <div className='date'>

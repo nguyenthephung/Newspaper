@@ -4,7 +4,7 @@ import Hero from "./hero/Hero";
 import Homes from "./mainContent/homes/Home";
 import Discover from "./discover/Discover";
 import { getArticle } from "../../redux/apiRequest";
-import "./Homepages.css"; // Nhớ import file CSS của bạn
+import "./Homepages.css"; 
 
 const Homepages = () => {
   const dispatch = useDispatch();

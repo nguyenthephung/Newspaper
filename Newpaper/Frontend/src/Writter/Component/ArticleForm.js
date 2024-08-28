@@ -200,9 +200,11 @@ const ArticleForm = () => {
 
     const handleSave = (isPublished) => {
         const article = {
+            userId: user._id,
             title,
             author,
             category,
+            status:"pending",
             tags: selectedTags,
             content_blocks: contentBlocks,
             published: isPublished
@@ -220,23 +222,7 @@ const ArticleForm = () => {
     };
 
     // Hàm để cập nhật bookmarkedArticles
-    const handleBookmark = (articleId) => {
-        const updatedUser = {
-            ...user,
-            bookmarkedArticles: [...user.bookmarkedArticles, articleId],
-        };
-        updateUser(dispatch, updatedUser);
-        if (user && user.bookmarkedArticles) {
-            if (!user.bookmarkedArticles.includes(articleId)) {
-                dispatch(updateBookmarkedArticles([articleId]));
-            } else {
-                console.log("This article is already bookmarked.");
-            }
-        } else {
-            console.error("User or bookmarkedArticles not found");
-        }
-    };
-
+    
     return (
         <div className="article-form">
             <input
@@ -316,7 +302,7 @@ const ArticleForm = () => {
             </div>
             <button onClick={handleSaveDraft} className="save-draft-button">Save Draft</button>
             <button onClick={handlePublish} className="publish-button">Publish</button>
-            <button onClick={() => handleBookmark(location.state.article._id)} className="bookmark-button">Bookmark</button>
+    
         </div>
     );
 };

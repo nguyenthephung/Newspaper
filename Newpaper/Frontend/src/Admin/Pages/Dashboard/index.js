@@ -242,7 +242,7 @@ function Dashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalArticles, setTotalArticles] = useState(0);
   const [monthlyViews, setMonthlyViews] = useState([]);
-  
+
   const dispatch = useDispatch();
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
   const users = useSelector((state) => state.user?.users?.allUsers) || [];
@@ -252,14 +252,9 @@ function Dashboard() {
     const totalArticlesCount = articles.length;
     const totalViewsCount = articles.reduce((acc, article) => acc + article.views, 0);
 
-    // Lọc 5 bài viết có lượt xem cao nhất
-    const topArticles = articles
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 5);
-
     // Tính tổng lượt xem theo từng tháng
     const monthlyData = articles.reduce((acc, article) => {
-      const month = new Date(article.createdAt).toLocaleString('default', { month: 'long' }); // Lấy tháng từ createdAt
+      const month = new Date(article.createdAt).toLocaleString('default', { month: 'long' });
       if (!acc[month]) acc[month] = 0;
       acc[month] += article.views;
       return acc;
@@ -272,8 +267,8 @@ function Dashboard() {
 
     setTotalArticles(totalArticlesCount);
     setTotalViews(totalViewsCount);
-    setTotalUsers(users.length); // Tổng số người dùng
-    setMonthlyViews(monthlyViewsData); // Lượt xem theo từng tháng
+    setTotalUsers(users.length);
+    setMonthlyViews(monthlyViewsData);
   }, [articles, users]);
 
   return (
@@ -355,7 +350,7 @@ function TopArticles({ articles }) {
 
   useEffect(() => {
     setLoading(true);
-    const topArticles = articles
+    const topArticles = [...articles] // Sao chép mảng trước khi sắp xếp
       .sort((a, b) => b.views - a.views)
       .slice(0, 5);
     setDataSource(topArticles);
@@ -381,7 +376,7 @@ function TopArticles({ articles }) {
         loading={loading}
         dataSource={dataSource}
         pagination={false}
-        rowKey="_id" // Giả sử mỗi bài viết có thuộc tính _id
+        rowKey="_id"
       />
     </>
   );

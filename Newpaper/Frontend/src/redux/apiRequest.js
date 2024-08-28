@@ -24,20 +24,23 @@ import {
   getArticleStart,
   getArticleSuccess,
   getArticleFailed,
-  updateArticleStart,
-  updateArticleSuccess,
-  updateArticleFailed,
   deleteArticleStart,
   deleteArticleSuccess,
   deleteArticleFailed,
+} from "./articleSlice";
+import {
   getArticlePendingStart,
   getArticlePendingSuccess,
   getArticlePendingFailed,
   updateArticlePendingStart,
   updateArticlePendingSuccess,
   updateArticlePendingFailed,
-} from "./articleSlice";
-
+}from "./articlePendingSlice";
+import {
+  getBookMakedStart,     
+  getBookMakedSuccess,
+  getBookMakedFailed,
+} from "./bookMakedSlice"
 import {
   getCategoryStart,
   getCategorySuccess,
@@ -87,6 +90,7 @@ export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
   try {
     const res = await axios.post("/v1/auth/login", user);
+    console.log(res.data);
     dispatch(loginSuccess(res.data));
     navigate("/");
   } catch (err) {
@@ -177,16 +181,20 @@ export const getArticle = async (dispatch) =>{
     const res= await axios.get("/v1/article/getArticle");
     dispatch(getArticleSuccess(res.data));
    }catch(err){
+    console.log(err)
     dispatch(getArticleFailed());
    }
 
 };
-export const updateArticle = async (dispatch,article) =>{
-
-  try{
-   const res= await axios.post("/v1/article/updateArticle",article);
-
-  }catch(err){
+export const updateArticle = async (dispatch, article) => {
+  try {
+    const res = await axios.post("/v1/article/updateArticle", article);
+    // Xử lý phản hồi thành công nếu cần
+    console.log('Article updated successfully:', res.data);
+  } catch (err) {
+    // Xử lý lỗi từ server
+    console.error('Error updating article:', err.response ? err.response.data : err.message);
+    // Có thể thông báo lỗi cho người dùng tại đây
   }
 
 };
@@ -209,15 +217,25 @@ export const getArticlePending = async (dispatch) =>{
   }
 
 };
-export const updateArticlePending = async (dispatch,id,status) =>{
- dispatch(updateArticlePendingStart());
- try{
-  const res= await axios.post("/v1/article/updateArticlePending"+id,status);
-  dispatch(updateArticlePendingSuccess(res.data));
- }catch(err){
-  dispatch(updateArticlePendingFailed());
- }
-
+export const updateArticlePending = async (dispatch, id, status) => {
+  dispatch(updateArticlePendingStart());
+  try {
+    // Sửa đường dẫn để thêm dấu '/' và truyền status trong body của yêu cầu
+    const res = await axios.post(`/v1/article/updateArticlePending/${id}`, { status });
+    dispatch(updateArticlePendingSuccess(res.data));
+  } catch (err) {
+    dispatch(updateArticlePendingFailed());
+  }
+};
+export const getBookMaked = async (dispatch, id) => {
+  dispatch(getBookMakedStart());
+  try {
+    // Sử dụng axios để gửi yêu cầu GET, sử dụng id trong đường dẫn API
+    const res = await axios.post(`/v1/article/getBookMaked/${id}`);
+    dispatch(getBookMakedSuccess(res.data));
+  } catch (err) {
+    dispatch(getBookMakedFailed());
+  }
 };
 //Category
 export const getCategories = async (dispatch)=>{
@@ -297,6 +315,7 @@ export const getComment = async (dispatch) => {
   dispatch(getCommentStart());
   try {
     const res = await axios.get("/v1/comment/getComment");
+    console.log(res.data);
     dispatch(getCommentSuccess(res.data));
   } catch (err) {
     dispatch(getCommentFailed());

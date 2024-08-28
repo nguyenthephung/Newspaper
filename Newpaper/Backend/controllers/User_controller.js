@@ -16,6 +16,7 @@ const userController = {
       await newUser.save();
       res.status(201).json(newUser);
     } catch (err) {
+      console.log(err);
       res.status(400).json({ error: err.message });
     }
   },
@@ -71,7 +72,6 @@ const userController = {
         res.status(200).json({ ...others, accessToken, refreshToken });
       }
     } catch (err) {
-      console.log(err);
       res.status(500).json(err);
     }
   },
@@ -112,21 +112,6 @@ const userController = {
     res.clearCookie("refreshToken");
     res.status(200).json("Logged out successfully!");
   },
-  update: async (req, res) => {
-    try {
-      if (req.body.password) {
-        const salt = await bcrypt.genSalt(10);
-        req.body.password = await bcrypt.hash(req.body.password, salt);
-      }
-      const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      return res.json(updatedUser);
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
-    }
-  },
 
   getAll: async (req, res) => {
     try {
@@ -150,30 +135,37 @@ const userController = {
     }
   },
 
-  updateOrCreate: async (req, res) => {
-    try {
-      const { _id, ...userData } = req.body;
-  
-      let user;
-      if (_id) {
-        // Nếu có _id, tìm user để cập nhật
-        user = await User.findById(_id);
-        if (user) {
-          // Cập nhật người dùng nếu tồn tại
-          user = await User.findByIdAndUpdate(_id, userData, { new: true, runValidators: true });
-          return res.json({ message: 'User updated', user });
-        }
-      }
-      
-      // Nếu không có _id hoặc không tìm thấy user, tạo mới
-      user = new User(userData);
-      await user.save();
-      return res.status(201).json({ message: 'User created', user });
-    } catch (err) {
-      console.error("Error in updateOrCreate:", err);
-      return res.status(400).json({ error: err.message });
+
+updateOrCreate: async (req, res) => {
+  try {
+    const { _id, password, ...userData } = req.body;
+
+    // Băm mật khẩu nếu có
+    if (password) {
+      const saltRounds = 10; // Số vòng băm
+      userData.password = await bcrypt.hash(password, saltRounds);
     }
+
+    let user;
+    if (_id) {
+      // Nếu có _id, tìm user để cập nhật
+      user = await User.findById(_id);
+      if (user) {
+        // Cập nhật người dùng nếu tồn tại
+        user = await User.findByIdAndUpdate(_id, userData, { new: true, runValidators: true });
+        return res.json({ message: 'User updated', user });
+      }
+    }
+    
+    // Nếu không có _id hoặc không tìm thấy user, tạo mới
+    user = new User(userData);
+    await user.save();
+    return res.status(201).json({ message: 'User created', user });
+  } catch (err) {
+    console.error("Error in updateOrCreate:", err);
+    return res.status(400).json({ error: err.message });
   }
+}
   
   
   

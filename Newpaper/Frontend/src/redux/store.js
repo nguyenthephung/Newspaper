@@ -6,6 +6,8 @@ import categoryReducer from "./categorySlice";
 import tagReducer from "./tagSlice";
 import commentReducer from "./commentSlice";
 import ratingReducer from "./ratingSlice";
+import articlePendingReducer from "./articlePendingSlice"
+import bookMakedReducer from "./bookMakedSlice"
 import {
   persistStore,
   persistReducer,
@@ -23,7 +25,7 @@ const persistConfig = {
   version: 1,
   storage,
 };
-const rootReducer = combineReducers({ auth: authReducer, user: userReducer, article: articleReducer ,category: categoryReducer, tag: tagReducer,comment : commentReducer,rating : ratingReducer});
+const rootReducer = combineReducers({ auth: authReducer, user: userReducer, article: articleReducer ,category: categoryReducer, tag: tagReducer,comment : commentReducer,rating : ratingReducer,articlePending :articlePendingReducer, bookMaked :bookMakedReducer});
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({

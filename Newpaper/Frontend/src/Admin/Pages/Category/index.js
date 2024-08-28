@@ -149,7 +149,7 @@
 
 // export default Category;
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Input, Space, Typography, message } from 'antd'; // Thêm message vào import
+import { Button, Table, Modal, Form, Input, Space, Typography, message } from 'antd';
 import { updateCategory, deleteCategory, getCategories } from '../../../redux/apiRequest';
 import { useDispatch, useSelector } from "react-redux";
 
@@ -165,7 +165,7 @@ const Category = () => {
 
   useEffect(() => {
     setLoading(true);
-    getCategories(dispatch).finally(() => setLoading(false)); // Đảm bảo setLoading(false) sau khi getCategories hoàn tất
+    getCategories(dispatch).finally(() => setLoading(false));
   }, [dispatch]);
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const Category = () => {
   }, [categories]);
 
   const handleAdd = () => {
-    setEditingCategory(null); // Xóa dữ liệu khi bấm vào Add
+    setEditingCategory(null);
     setIsModalVisible(true);
   };
 
@@ -189,7 +189,7 @@ const Category = () => {
     try {
       await deleteCategory(dispatch, record?._id);
       message.success("Category deleted successfully");
-      getCategories(dispatch);
+      await getCategories(dispatch); // Đảm bảo gọi getCategories sau khi xóa
     } catch (error) {
       message.error("Failed to delete category: " + error.message);
     }
@@ -200,7 +200,7 @@ const Category = () => {
       ...editingCategory,
       name: values.name,
       description: values.description,
-      tags: editingCategory?.tags || [], // Cập nhật tags
+      tags: editingCategory?.tags || [],
     };
 
     try {
@@ -208,22 +208,19 @@ const Category = () => {
 
       if (response) {
         if (editingCategory) {
-          // Cập nhật danh mục hiện có
           const newData = dataSource.map((category) =>
             category._id === editingCategory._id ? response : category
           );
           setDataSource(newData);
           setFilteredData(newData);
         } else {
-          // Thêm danh mục mới
           const newData = [...dataSource, response];
           setDataSource(newData);
           setFilteredData(newData);
         }
 
-        // Gọi lại getCategories để đảm bảo dữ liệu luôn cập nhật
         message.success("Category saved successfully");
-        getCategories(dispatch);
+        await getCategories(dispatch); // Đảm bảo gọi getCategories sau khi lưu
       }
     } catch (error) {
       message.error("Failed to save category: " + error.message);
@@ -268,12 +265,12 @@ const Category = () => {
           },
           {
             title: "Tags",
-            dataIndex: "tags", // Cập nhật thành tags
+            dataIndex: "tags",
             render: (tags) => (
               <ul style={{ paddingInlineStart: 0 }}>
                 {tags?.map((tag, index) => (
                   <li key={index} style={{ marginBottom: '15px' }}>
-                    <strong>Tag:</strong> {tag} <br /> {/* Hiển thị tag */}
+                    <strong>Tag:</strong> {tag} <br />
                   </li>
                 ))}
               </ul>

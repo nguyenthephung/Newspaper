@@ -161,7 +161,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateUser, logOut } from '../../redux/apiRequest';
 import { createAxios } from '../../createInstance';
 import { loginSuccess } from '../../redux/authSlice';
-
+import { updateUserInfo } from '../../redux/authSlice';
 const { Option } = Select;
 
 const UserInfo = () => {
@@ -180,6 +180,7 @@ const UserInfo = () => {
         console.log('Updated user info:', values);
         const updatedUser = { ...user, ...values };
         updateUser(dispatch, updatedUser);
+        dispatch(updateUserInfo (updatedUser))
         setEditModalVisible(false);
     };
 
@@ -245,6 +246,7 @@ const UserInfo = () => {
                         <Input />
                     </Form.Item>
                     <Form.Item
+                     style={{ width: '300px' }} 
                         name="categories"
                         label="Categories"
                         rules={[{ required: true, message: 'Please select your categories!' }]}
