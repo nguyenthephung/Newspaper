@@ -46,16 +46,15 @@ const articleSlice = createSlice({
       state.updateArticle.error = true;
     },
     deleteArticleStart: (state) => {
-      state.deleteArticle.loading = true;
-      state.deleteArticle.error = false;
-    },
+    
+    }    
+,    
     deleteArticleSuccess: (state, action) => {
-      state.deleteArticle.loading = false;
+ 
       state.deleteArticle.article = action.payload;
     },
     deleteArticleFailed: (state) => {
-      state.deleteArticle.loading = false;
-      state.deleteArticle.error = true;
+  
     },
     
   },

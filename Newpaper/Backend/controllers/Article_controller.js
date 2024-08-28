@@ -151,35 +151,29 @@ const articleController = {
   
     delete: async (req, res) => {
       try {
+        // Tìm bài viết bằng ID
         const article = await Article.findById(req.params.id);
-  
         if (!article) {
           return res.status(404).json({ message: 'Article not found' });
         }
-  
-        if (!req.user.isAdmin && String(article.author) !== String(req.user.id)) {
-          return res.status(403).json({ message: 'You are not authorized to delete this article' });
-        }
-  
-        if (article.status !== 'approved') {
-          return res.status(403).json({ message: 'Article cannot be deleted unless it is approved' });
-        }
-  
+    
         // Xóa bài viết
         await Article.findByIdAndDelete(req.params.id);
-  
-        // Xóa bài viết khỏi bookmarkedArticles của tất cả người dùng
+    
+        // Xóa bài viết khỏi danh sách bookmarkedArticles của tất cả người dùng
         await User.updateMany(
           { bookmarkedArticles: article._id },
           { $pull: { bookmarkedArticles: article._id } }
         );
-  
+    
         res.json({ message: 'Article deleted and removed from all user bookmarks' });
       } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
       }
     },
+    
+    
    getBookMaked : async (req, res) => {
       const userId = req.params.id;
       try {
