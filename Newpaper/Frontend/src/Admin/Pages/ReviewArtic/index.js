@@ -213,10 +213,11 @@ const ReviewArticles = () => {
   const [currentArticle, setCurrentArticle] = useState(null);
   
   const users = useSelector((state) => state.user?.users?.allUsers) || [];
-  const articles =  useSelector((state) => state.article?.getArticle?.articles);
-  const articlesPending = articles?.filter(article => 
-    article.status === 'reject' || article.status === 'pending'
-  );
+
+  const publishedArticles = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
+
+const articlesPending = publishedArticles.filter(article => article.publish === true);
+
   useEffect(() => {
     if (!user) {
       navigate("/"); // Redirect to home page if user doesn't exist
@@ -253,9 +254,8 @@ const ReviewArticles = () => {
   };
 
   const handleViewContent = (article) => {
-    setCurrentArticle(article);
-    setModalVisible(true);
-  };
+    navigate(`/testpage/${article._id}`);
+};
 
   const handleCloseModal = () => {
     setModalVisible(false);

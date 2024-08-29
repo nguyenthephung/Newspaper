@@ -23,6 +23,7 @@ import UserInfo from "./Writter/Component/UserInfo";
 import Searchpage from "./Customer/Searchpages/Searchpage";
 import Publish from "./Writter/Component/Publishpage/Publish";
 import Draft from "./Writter/Component/Draftpage/Draft";
+import TestPage from "./Writter/testPage"
 function App() {
   return (
     <div className="App">
@@ -164,9 +165,18 @@ function App() {
           <Footer />
         </div>
       } />
+         <Route path="/testpage/:id" element={
+        <div>
+        
+         <TestPage/>
+
+        </div>
+      } />
     </Routes>
+    
 
     </div>
+    
     
   );
 }

@@ -91,7 +91,7 @@ import React, { useState ,useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
 import { useDispatch,useSelector } from "react-redux";
-import { deleteArticle ,getBookMaked} from "../../../redux/apiRequest";
+import { deleteArticle ,getBookMaked,getArticlePending} from "../../../redux/apiRequest";
 import "./publish.css";
 
 
@@ -105,7 +105,10 @@ const Publish = () => {
       getBookMaked(dispatch, user._id);
     }
   }, [dispatch, user]);
-  
+
+useEffect(() => {
+  getArticlePending(dispatch);
+}, [dispatch]);
   // Sửa hàm handleDelete
 const handleDelete = (id) => {
   deleteArticle(dispatch, id).then(() => {
@@ -142,7 +145,7 @@ const handleDelete = (id) => {
                   </div>
                   <div className='text'>
                     <h1 className='title'>
-                      <Link to={`/SinglePage/${val._id}`}>{val.title.slice(0, 40)}...</Link>
+                      <Link to={`/testpage/${val._id}`}>{val.title.slice(0, 40)}...</Link>
                     </h1>
                     <div className='date'>
                       <i className='fas fa-calendar-days'></i>

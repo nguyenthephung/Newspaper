@@ -150,6 +150,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { updateArticle } from '../../redux/apiRequest';
 import { useDispatch, useSelector } from 'react-redux';
+import { notification } from 'antd';  // Nhập notification từ antd
 import './ArticleForm.css';
 
 const ArticleForm = () => {
@@ -209,7 +210,15 @@ const ArticleForm = () => {
             publish: isPublished
         };
         updateArticle(dispatch, article);
-        navigate('/writer');  // Chuyển hướng sau khi lưu
+
+        // Hiển thị thông báo khi lưu thành công
+        notification.success({
+            message: 'Success',
+            description: isPublished ? 'Article published successfully!' : 'Draft saved successfully!',
+        });
+
+        // Chuyển hướng sau khi lưu
+        navigate('/writer');
     };
 
     const handleSaveDraft = () => {
