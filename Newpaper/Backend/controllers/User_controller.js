@@ -141,7 +141,6 @@ const userController = {
   updateOrCreate: async (req, res) => {
     try {
       const { _id, password, ...userData } = req.body;
-  
       if (password) {
         // Kiểm tra nếu mật khẩu đã được băm hay chưa
         const isHashed = password.startsWith('$2b$') || password.startsWith('$2a$');

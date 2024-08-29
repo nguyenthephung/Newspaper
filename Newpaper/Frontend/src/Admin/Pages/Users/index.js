@@ -208,21 +208,29 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, updateUser, deleteUser } from "../../../redux/apiRequest";
 import debounce from 'lodash/debounce';
-
+import { useNavigate } from "react-router-dom";
 const Users = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const users = useSelector((state) => state.user?.users?.allUsers) || []; 
   const [loading, setLoading] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [form] = Form.useForm();
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
         await getAllUsers(dispatch);
+      } catch (error) {
+        message.error("Failed to fetch users: " + error.message);
       } finally {
         setLoading(false);
       }
@@ -240,77 +248,79 @@ const Users = () => {
     );
   }, [users, searchTerm]);
 
-  const handleAddCustomer = () => {
-    setEditingCustomer(null);
+  const handleAddUser = () => {
+    setEditingUser(null);
     form.resetFields();
     setModalVisible(true);
   };
 
-  const handleEditCustomer = (customer) => {
-    setEditingCustomer(customer);
+  const handleEditUser = (user) => {
+    setEditingUser(user);
     form.setFieldsValue({
-      ...customer,
-      phoneNumber: customer.socialAccounts?.phoneNumber
+      ...user,
+      phoneNumber: user.socialAccounts?.phoneNumber,
     });
     setModalVisible(true);
   };
 
-  const handleDeleteCustomer = (customerId) => {
+  const handleDeleteUser = async (userId) => {
     setLoading(true);
-    deleteUser(dispatch, customerId)
-      .then(() => getAllUsers(dispatch))
-      .finally(() => setLoading(false));
+    try {
+      await deleteUser(dispatch, userId);
+      message.success("User deleted successfully");
+      await getAllUsers(dispatch);
+    } catch (error) {
+      message.error("Failed to delete user: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveCustomer = () => {
-    form.validateFields().then((values) => {
-      setLoading(true);
-      const userData = {
-        ...values,
-        socialAccounts: {
-          phoneNumber: values.phoneNumber
+  const handleSaveUser = async () => {
+    try {
+        const values = await form.validateFields();
+        setLoading(true);
+
+        const userData = {
+            username: values.username,
+            email: values.email,
+            isAdmin: values.isAdmin || false,
+            socialAccounts: {
+                phoneNumber: values.phoneNumber || '',
+            },
+        };
+
+        if (values.password) {
+            userData.password = values.password;
         }
-      };
-      
-      if (editingCustomer && editingCustomer._id) {
-        // Updating existing user
-        if (!values.password) {
-          delete userData.password; // Remove password if not provided
-        }
-        updateUser({ ...editingCustomer, ...userData })
-          .then(() => {
+
+        if (editingUser) {
+            // Sửa người dùng hiện có
+            const updatedUser = { ...userData, _id: editingUser._id };
+            await updateUser(dispatch, updatedUser);
             message.success("User updated successfully");
-            return getAllUsers(dispatch);
-          })
-          .catch((error) => {
-            message.error("Failed to update user: " + error.message);
-          })
-          .finally(() => {
-            setModalVisible(false);
-            setLoading(false);
-          });
-      } else {
-        // Creating new user
-        if (!values.password) {
-          message.error("Password is required for new users");
-          setLoading(false);
-          return;
-        }
-        updateUser(userData)
-          .then(() => {
+        } else {
+            // Thêm người dùng mới
+            if (!values.password) {
+                message.error("Password is required for new users");
+                setLoading(false);
+                return;
+            }
+            await updateUser(dispatch, userData); // Không thêm _id khi thêm người dùng mới
             message.success("User created successfully");
-            return getAllUsers(dispatch);
-          })
-          .catch((error) => {
-            message.error("Failed to create user: " + error.message);
-          })
-          .finally(() => {
-            setModalVisible(false);
-            setLoading(false);
-          });
-      }
-    });
-  };
+        }
+
+        await getAllUsers(dispatch);
+        setModalVisible(false);
+        form.resetFields();
+    } catch (error) {
+        message.error("Operation failed: " + error.message);
+    } finally {
+        setLoading(false);
+    }
+};
+
+  
 
   const handleSearch = debounce((value) => {
     setSearchTerm(value);
@@ -342,10 +352,10 @@ const Users = () => {
       dataIndex: "action",
       render: (_, record) => (
         <Space>
-          <Button type="primary" onClick={() => handleEditCustomer(record)}>
+          <Button type="primary" onClick={() => handleEditUser(record)}>
             Edit
           </Button>
-          <Button danger onClick={() => handleDeleteCustomer(record._id)}>
+          <Button danger onClick={() => handleDeleteUser(record._id)}>
             Delete
           </Button>
         </Space>
@@ -357,7 +367,7 @@ const Users = () => {
     <Space size={20} direction="vertical" style={{ width: '100%' }}>
       <Typography.Title level={4}>Users</Typography.Title>
       <Space direction="horizontal" style={{ width: '100%', justifyContent: 'space-between' }}>
-        <Button type="primary" onClick={handleAddCustomer}>
+        <Button type="primary" onClick={handleAddUser}>
           Add User
         </Button>
         <Input.Search
@@ -375,29 +385,53 @@ const Users = () => {
         rowKey="_id"
       />
       <Modal
-        title={editingCustomer ? "Edit User" : "Add User"}
+        title={editingUser ? "Edit User" : "Add User"}
         visible={modalVisible}
-        onOk={handleSaveCustomer}
+        onOk={handleSaveUser}
         onCancel={() => setModalVisible(false)}
+        confirmLoading={loading}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="username" label="Username" rules={[{ required: true, message: "Please enter username" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: "Please enter email" }, { type: "email", message: "Please enter a valid email" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item 
-            name="password" 
-            label="Password" 
-            rules={[{ required: !editingCustomer, message: "Please enter password" }]}
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true, message: "Please enter username" }]}
           >
-            <Input.Password placeholder={editingCustomer ? "Leave blank to keep current password" : "Enter password"} />
+            <Input />
           </Form.Item>
-          <Form.Item name="isAdmin" valuePropName="checked">
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please enter email" },
+              { type: "email", message: "Please enter a valid email" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              {
+                required: !editingUser,
+                message: "Please enter password",
+              },
+            ]}
+          >
+            <Input.Password placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"} />
+          </Form.Item>
+          <Form.Item
+            name="isAdmin"
+            valuePropName="checked"
+            initialValue={false}
+          >
             <Checkbox>Is Admin</Checkbox>
           </Form.Item>
-          <Form.Item name="phoneNumber" label="Phone Number">
+          <Form.Item
+            name="phoneNumber"
+            label="Phone Number"
+          >
             <Input />
           </Form.Item>
         </Form>

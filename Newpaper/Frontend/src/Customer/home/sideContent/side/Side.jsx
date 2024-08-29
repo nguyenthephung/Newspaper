@@ -9,7 +9,7 @@ import Tpost from "../Tpost/Tpost";
 
 const Side = () => {
   const user = useSelector((state) => state.auth?.login?.currentUser);
-  const [subscribed, setSubscribed] = useState(user.Subscribe);
+  const [subscribed, setSubscribed] = useState(user?.Subscribe);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();

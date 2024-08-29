@@ -200,11 +200,13 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Input, Space, Typography, message, Select } from 'antd';
 import { useDispatch, useSelector } from "react-redux";
 import { updateTag, deleteTag, getTag } from '../../../redux/apiRequest';
-
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const Tag = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const tags = useSelector((state) => state.tag?.getTag?.tags) || [];
   const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
   const [loading, setLoading] = useState(false);
@@ -213,7 +215,11 @@ const Tag = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTag, setEditingTag] = useState(null);
   const [searchText, setSearchText] = useState('');
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     setLoading(true);
     getTag(dispatch).finally(() => setLoading(false));

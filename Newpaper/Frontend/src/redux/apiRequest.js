@@ -126,7 +126,8 @@ export const getAllUsers = async (dispatch) => {
   dispatch(getUsersStart());
   try {
     const res = await axios.get("/v1/user");
-    dispatch(getUsersSuccess(res.data));
+    const reversedData = res.data.reverse(); 
+    dispatch(getUsersSuccess(reversedData ));
   } catch (err) {
     dispatch(getUsersFailed());
   }
@@ -180,7 +181,8 @@ export const getArticle = async (dispatch) =>{
    dispatch(getArticleStart());
    try{
     const res= await axios.get("/v1/article/getArticle");
-    dispatch(getArticleSuccess(res.data));
+    const reversedData = res.data.reverse(); 
+    dispatch(getArticleSuccess(reversedData ));
    }catch(err){
     console.log(err)
     dispatch(getArticleFailed());
@@ -212,7 +214,8 @@ export const getArticlePending = async (dispatch) =>{
   dispatch(getArticlePendingStart());
   try{
    const res= await axios.get("/v1/article/getArticlePending");
-   dispatch(getArticlePendingSuccess(res.data));
+   const reversedData = res.data.reverse(); 
+   dispatch(getArticlePendingSuccess(reversedData));
   }catch(err){
    dispatch(getArticlePendingFailed());
   }
@@ -233,7 +236,8 @@ export const getBookMaked = async (dispatch, id) => {
   try {
     // Sử dụng axios để gửi yêu cầu GET, sử dụng id trong đường dẫn API
     const res = await axios.post(`/v1/article/getBookMaked/${id}`);
-    dispatch(getBookMakedSuccess(res.data));
+    const reversedData = res.data.reverse(); 
+    dispatch(getBookMakedSuccess(reversedData));
   } catch (err) {
     dispatch(getBookMakedFailed());
   }
@@ -243,7 +247,8 @@ export const getCategories = async (dispatch)=>{
   dispatch(getCategoryStart());
   try{
    const res= await axios.get("/v1/category/getCategory");
-   dispatch(getCategorySuccess(res.data));
+   const reversedData = res.data.reverse(); 
+   dispatch(getCategorySuccess(reversedData));
   }catch(err){
    dispatch(getCategoryFailed());
   }
@@ -285,7 +290,8 @@ export const getTag = async (dispatch) => {
   dispatch(getTagStart());
   try {
     const res = await axios.get("/v1/tag/getTag");
-    dispatch(getTagSuccess(res.data));
+    const reversedData = res.data.reverse(); 
+    dispatch(getTagSuccess(reversedData ));
   } catch (err) {
     dispatch(getTagFailed());
   }

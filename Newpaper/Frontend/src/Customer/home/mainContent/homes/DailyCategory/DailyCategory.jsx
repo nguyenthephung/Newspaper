@@ -123,7 +123,6 @@
 
 // export default DailyCategory;
 
-
 import React, { useState } from "react";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
@@ -149,7 +148,7 @@ const DailyCategory = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
+    slidesToShow: 2,
     slidesToScroll: 1,
   };
 
@@ -168,30 +167,35 @@ const DailyCategory = () => {
         <div className='content'>
           {filteredArticles.length > 0 ? (
             <Slider {...settings}>
-              {filteredArticles.map((val) => (
-                <div className='items' key={val._id}>
-                  <div className='box shadow'>
-                    <div className='images'>
-                      {val.content_blocks && val.content_blocks.map((block, index) =>
-                        block.type === "image" ? (
-                          <div className='img' key={index}>
-                            <img src={block.src} alt={block.alt} />
+              {filteredArticles.map((val) => {
+                // Lấy ảnh đầu tiên trong content_blocks
+                const firstImageBlock = val.content_blocks.find(block => block.type === "image");
+                const imageSrc = firstImageBlock ? firstImageBlock.src : null;
+                const imageAlt = firstImageBlock ? firstImageBlock.alt : "No Image";
+
+                return (
+                  <div className='items' key={val._id}>
+                    <div className='box shadow'>
+                      <div className='images'>
+                        {imageSrc && (
+                          <div className='img'>
+                            <img src={imageSrc} alt={imageAlt} />
                           </div>
-                        ) : null
-                      )}
-                    </div>
-                    <div className='text'>
-                      <Link to={`/SinglePage/${val._id}`}>
-                        <h1 className='title'>{val.title.slice(0, 40)}...</h1>
-                      </Link>
-                      <div className='date'>
-                        <i className='fas fa-calendar-days'></i>
-                        <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+                        )}
+                      </div>
+                      <div className='text'>
+                        <Link to={`/SinglePage/${val._id}`}>
+                          <h1 className='title'>{val.title.slice(0, 40)}...</h1>
+                        </Link>
+                        <div className='date'>
+                          <i className='fas fa-calendar-days'></i>
+                          <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </Slider>
           ) : (
             <p>Không có bài báo nào cho ngày đã chọn.</p>
@@ -203,4 +207,3 @@ const DailyCategory = () => {
 };
 
 export default DailyCategory;
-

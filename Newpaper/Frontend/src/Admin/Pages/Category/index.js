@@ -152,9 +152,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Input, Space, Typography, message } from 'antd';
 import { updateCategory, deleteCategory, getCategories } from '../../../redux/apiRequest';
 import { useDispatch, useSelector } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 const Category = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const categories = useSelector((state) => state.category?.getCategory?.categories) || [];
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
@@ -162,7 +164,11 @@ const Category = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [searchText, setSearchText] = useState('');
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     setLoading(true);
     getCategories(dispatch).finally(() => setLoading(false));

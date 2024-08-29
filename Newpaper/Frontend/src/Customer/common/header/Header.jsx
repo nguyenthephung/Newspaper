@@ -371,7 +371,7 @@ const Header = () => {
                   Home
                 </Link>
               </li>
-              {categories.length > 0 && categories.slice(0, 9).map((category, index) => (
+              {categories.length > 0 && categories.slice(0, 7).map((category, index) => (
                 <li key={index}>
                   <Link to={`/${category.name}/${category.tags[0]}`} className="ant-dropdown-link hover:text-gray-700">
                     {category.name}

@@ -147,9 +147,8 @@
 
 // export default ArticleForm;
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom'; 
-import { updateArticle, updateUser } from '../../redux/apiRequest';
-import { updateBookmarkedArticles } from '../../redux/authSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { updateArticle } from '../../redux/apiRequest';
 import { useDispatch, useSelector } from 'react-redux';
 import './ArticleForm.css';
 
@@ -190,7 +189,7 @@ const ArticleForm = () => {
     };
 
     const handleContentTypeChange = (type) => {
-        setContentBlocks([...contentBlocks, { type, content: '' }]);
+        setContentBlocks([...contentBlocks, { type, content: '', src: '', alt: '' }]);
     };
 
     const handleDeleteContentBlock = (index) => {
@@ -204,7 +203,7 @@ const ArticleForm = () => {
             title,
             author,
             category,
-            status:"pending",
+            status: "pending",
             tags: selectedTags,
             content_blocks: contentBlocks,
             publish: isPublished
@@ -221,8 +220,13 @@ const ArticleForm = () => {
         handleSave(true);
     };
 
-    // Hàm để cập nhật bookmarkedArticles
-    
+    // Hàm để cập nhật content_blocks
+    const handleContentChange = (index, field, value) => {
+        const newBlocks = [...contentBlocks];
+        newBlocks[index][field] = value;
+        setContentBlocks(newBlocks);
+    };
+
     return (
         <div className="article-form">
             <input
@@ -276,22 +280,14 @@ const ArticleForm = () => {
                         {block.type === 'image' ? (
                             <input
                                 type="text"
-                                value={block.content}
-                                onChange={(e) => {
-                                    const newBlocks = [...contentBlocks];
-                                    newBlocks[index].content = e.target.value;
-                                    setContentBlocks(newBlocks);
-                                }}
+                                value={block.src}  // Sử dụng src thay vì content cho ảnh
+                                onChange={(e) => handleContentChange(index, 'src', e.target.value)}
                                 placeholder="Image URL"
                             />
                         ) : (
                             <textarea
                                 value={block.content}
-                                onChange={(e) => {
-                                    const newBlocks = [...contentBlocks];
-                                    newBlocks[index].content = e.target.value;
-                                    setContentBlocks(newBlocks);
-                                }}
+                                onChange={(e) => handleContentChange(index, 'content', e.target.value)}
                             />
                         )}
                         <button onClick={() => handleDeleteContentBlock(index)} className="delete-button">
@@ -302,7 +298,6 @@ const ArticleForm = () => {
             </div>
             <button onClick={handleSaveDraft} className="save-draft-button">Save Draft</button>
             <button onClick={handlePublish} className="publish-button">Publish</button>
-    
         </div>
     );
 };

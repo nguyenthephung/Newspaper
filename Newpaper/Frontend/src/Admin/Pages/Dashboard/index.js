@@ -217,6 +217,7 @@ import {
 import { Card, Space, Statistic, Table, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -244,9 +245,15 @@ function Dashboard() {
   const [monthlyViews, setMonthlyViews] = useState([]);
 
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
   const users = useSelector((state) => state.user?.users?.allUsers) || [];
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     // Tính tổng số bài viết và tổng số lượt xem
     const totalArticlesCount = articles.length;

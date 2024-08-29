@@ -3,12 +3,18 @@ import { Button, Table, Modal, Form, Input, Space, Typography, Select, Rate } fr
 const { Option } = Select;
 import { useDispatch, useSelector } from "react-redux";
 import { getArticle, updateArticle, deleteArticle, getCategories } from '../../../redux/apiRequest';
-
+import { useNavigate } from "react-router-dom";
 const Article = () => {
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const articles = useSelector((state) => state.article?.getArticle?.articles);
   const categories = useSelector((state) => state.category?.getCategory?.categories);
   const dispatch = useDispatch();
-  
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     getArticle(dispatch);
     getCategories(dispatch);

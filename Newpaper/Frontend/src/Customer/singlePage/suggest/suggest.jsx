@@ -186,16 +186,10 @@ import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 
 const Suggest = ({ category }) => {
-  // Nhận ID từ useParams
   const { id } = useParams();
-
-  // Lấy dữ liệu từ Redux store
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
-
-  // Tạo state để lưu trữ bài viết đã lọc
   const [filteredPosts, setFilteredPosts] = useState([]);
 
-  // Sử dụng useEffect để lọc lại bài viết mỗi khi id hoặc articles thay đổi
   useEffect(() => {
     const posts = articles.filter((post) => 
       post.category === category && post.id !== id
@@ -203,7 +197,6 @@ const Suggest = ({ category }) => {
     setFilteredPosts(posts);
   }, [id, articles, category]);
 
-  // Cấu hình của slider
   const settings = {
     dots: true,
     infinite: true,
@@ -229,13 +222,10 @@ const Suggest = ({ category }) => {
     ],
   };
 
-  // URL hình ảnh dự phòng nếu không có hình ảnh từ bài viết
   const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
-
-  // Đảm bảo category là một chuỗi không rỗng và không phải là undefined
   const categoryTitle = typeof category === 'string' && category.trim() !== ''
-    ? `${category.charAt(0).toUpperCase() + category.slice(1)} Articles`
-    : "Articles";
+    ? `${category.charAt(0).toUpperCase() + category.slice(1)} `
+    : "";
 
   return (
     <section className="popularPost life">
@@ -244,29 +234,45 @@ const Suggest = ({ category }) => {
         {filteredPosts.length > 0 && (
           <Slider {...settings}>
             {filteredPosts.map((post) => {
-              // Tìm hình ảnh từ content_blocks
               const imageBlock = post.content_blocks.find(block => block.type === "image");
               const imageSrc = imageBlock ? imageBlock.src : fallbackImage;
               const imageAlt = imageBlock ? imageBlock.alt : "No Image";
 
               return (
-                <div className="items" key={post.id}>
-                  <div className="box shadow">
-                    <div className="images">
-                      <div className="img">
-                        <img src={imageSrc} alt={imageAlt} />
+                <div className="items" key={post.id} style={{ padding: "10px" }}>
+                  <div
+                    className="box shadow"
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div className="images" style={{ flexShrink: 0 }}>
+                      <div className="img" style={{ overflow: "hidden", borderRadius: "8px 8px 0 0" }}>
+                        <img
+                          src={imageSrc}
+                          alt={imageAlt}
+                          style={{
+                            width: "100%",
+                            height: "200px",
+                            objectFit: "cover",
+                          }}
+                        />
                       </div>
-                      <div className="category category1">
+                      <div className="category category1" style={{ marginTop: "10px" }}>
                         <span>{post.category}</span>
                       </div>
                     </div>
-                    <div className="text">
-                      <h1 className="title">
+                    <div className="text" style={{ padding: "15px", flexGrow: 1 }}>
+                      <h1 className="title" style={{ fontSize: "18px", marginBottom: "10px" }}>
                         <Link to={`/SinglePage/${post._id}`}>{post.title.slice(0, 40)}...</Link>
                       </h1>
-                      <div className="date">
+                      <div className="date" style={{ fontSize: "14px", color: "#888" }}>
                         <i className="fas fa-calendar-days"></i>
-                        <label>{post.date}</label>
+                        <label style={{ marginLeft: "5px" }}>{post.date}</label>
                       </div>
                     </div>
                   </div>

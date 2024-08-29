@@ -203,9 +203,11 @@ import { Table, Button, Space, Typography, Tag, Modal } from 'antd';
 import axios from 'axios';
 import { getArticle, updateArticlePending } from "../../../redux/apiRequest";
 import { useSelector, useDispatch } from 'react-redux';
-
+import { useNavigate } from "react-router-dom";
 const ReviewArticles = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.login?.currentUser);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentArticle, setCurrentArticle] = useState(null);
@@ -215,6 +217,11 @@ const ReviewArticles = () => {
   const articlesPending = articles?.filter(article => 
     article.status === 'reject' || article.status === 'pending'
   );
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
   useEffect(() => {
     setLoading(true);
     getArticle(dispatch);
