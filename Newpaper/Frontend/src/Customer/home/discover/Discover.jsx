@@ -42,7 +42,7 @@ const Discover = () => {
     <>
       <section className='discover'>
         <div className='container'>
-          <Heading title='Hot Tags' />
+          <Heading title='Thẻ hot' />
           <div className='content'>
             {discover.map((val, index) => {
               // Mã hóa các giá trị của category và tag

@@ -190,7 +190,7 @@ const Popular = () => {
     centerPadding: "0",
     slidesToShow: 2,
     speed: 500,
-    rows: 1,
+    rows: 6,
     slidesPerRow: 1,
     responsive: [
       {
@@ -236,7 +236,7 @@ const Popular = () => {
                         </div>
                       </div>
                       <div className="text row">
-                        <Link to={`/popular/${val._id}`}>
+                        <Link to={`/singlePage/${val._id}`}>
                           <h1 className="title">{val.title?.slice(0, 40) || 'No Title'}...</h1>
                         </Link>
                         <div className="date">

@@ -130,7 +130,7 @@ const handleDelete = (id) => {
 
   // Lọc các bài viết chưa được xuất bản và nằm trong danh sách bookmarkedArticles của user
   const unpublishedBookmarkedArticles = articles.filter(article =>
-    article.Publish === false );
+    article.publish === false );
 
   return (
     <>

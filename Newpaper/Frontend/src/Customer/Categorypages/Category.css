@@ -15,12 +15,15 @@
   
   .navbar-link {
     text-decoration: none;
-    color: #007bff;
-    font-weight: bold;
+    color: #1a1a1a; /* Sử dụng màu xám đậm thay vì đen */
+    font-weight: 500; /* Để giảm độ dày của chữ */
+    font-family: 'Roboto', sans-serif; /* Chọn một font chữ hiện đại */
+    letter-spacing: 0.5px; /* Tạo khoảng cách giữa các chữ để dễ đọc hơn */
+    transition: color 0.3s ease; /* Hiệu ứng chuyển màu mượt mà khi hover */
   }
   
   .navbar-link:hover {
-    text-decoration: underline;
+    color: #007bff; /* Màu xanh dương hiện đại khi hover */
   }
   
   /* Featured Article */

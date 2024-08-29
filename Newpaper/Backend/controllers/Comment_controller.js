@@ -1,34 +1,49 @@
 const Comment = require('../models/Comment_model')
 const mongoose = require('mongoose');
+const User = require('../models/User_model');
+const Article = require('../models/Article_model');
 // Lấy tất cả các comment
 const getAllComments = async (req, res) => {
   try {
-    // Tìm tất cả các comment và populate các trường liên kết
-    const comments = await Comment.find()
-      .populate({
-        path: 'article',
-        select: '_id' // Chọn trường _id từ Article
-      })
-      .populate({
-        path: 'user',
-        select: 'username' // Chọn trường username từ User
-      });
+    // Tìm tất cả các comment
+    const comments = await Comment.find();
+
+    // Lấy tất cả các userId và articleId từ các comment
+    const userIds = comments.map(comment => comment.user);
+    const articleIds = comments.map(comment => comment.article);
+
+    // Truy vấn để lấy thông tin các user và article tương ứng
+    const users = await User.find({ _id: { $in: userIds } }, 'username');
+    const articles = await Article.find({ _id: { $in: articleIds } }, '_id');
+
+    // Tạo một map để dễ dàng truy cập thông tin
+    const userMap = users.reduce((acc, user) => {
+      acc[user._id] = user.username;
+      return acc;
+    }, {});
+
+    const articleMap = articles.reduce((acc, article) => {
+      acc[article._id] = article._id;
+      return acc;
+    }, {});
 
     // Định dạng dữ liệu trả về
     const formattedComments = comments.map(comment => ({
-      _id:comment._id,
-      userId: comment.user._id,      // Lấy ObjectId của user
-      articleId: comment.article._id, // Lấy ObjectId của article
+      _id: comment._id,
+      userId: comment.user,          // Lấy ObjectId của user
+      articleId: comment.article,    // Lấy ObjectId của article
       content: comment.content,      // Lấy nội dung comment
-      user: comment.user.username,   // Lấy tên user từ trường username
+      user: userMap[comment.user],   // Lấy tên user từ map
       createdAt: comment.createdAt   // Lấy thời gian tạo comment
     }));
 
     res.status(200).json(formattedComments);
   } catch (error) {
+
     res.status(500).json({ message: 'Lỗi khi lấy comments', error });
   }
 };
+
 
 
 const updateOrCreateComment = async (req, res) => {

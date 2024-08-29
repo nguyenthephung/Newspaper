@@ -86,7 +86,7 @@ const Tpost = () => {
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
   // Lọc các bài báo có danh mục là "genz"
-  const filteredArticles = articles.filter((article) => article.category === "genz");
+  const filteredArticles = articles.filter((article) => article.category === "Giải trí");
 
   // URL hình ảnh dự phòng nếu không có hình ảnh từ bài viết
   const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
@@ -94,7 +94,7 @@ const Tpost = () => {
   return (
     <>
       <section className="tpost">
-        <Heading title="GenZ" />
+        <Heading title="Giải trí" />
         {filteredArticles.length > 0 ? (
           filteredArticles.map((val, index) => {
             // Lấy thông tin hình ảnh từ content_blocks

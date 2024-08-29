@@ -179,23 +179,25 @@ const Footer = () => {
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
   // Lọc bài báo theo danh mục
-  const sportsArticles = articles.filter(article => article.category === "Thể thao");
-  const scienceArticles = articles.filter(article => article.category === "Khoa học");
+  const sportsArticles = articles.filter(article => article.category === ("Kinh tế"));
+  const scienceArticles = articles.filter(article => article.category === ("Công nghệ"));
 
-  // Hàm lấy các thẻ (tags) từ bài báo
-  const getTags = (articles) => {
-    const tags = new Set();
+  // Hàm lấy các thẻ (tags) và số lượng bài viết từ bài báo
+  const getTagCounts = (articles) => {
+    const tagCounts = {};
     articles.forEach(article => {
-      article.tags.forEach(tag => tags.add(tag));
+      article.tags.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
     });
-    return Array.from(tags);
+    return tagCounts;
   };
 
-  const sportTags = getTags(sportsArticles);
-  const scienceTags = getTags(scienceArticles);
+  const sportTagCounts = getTagCounts(sportsArticles);
+  const scienceTagCounts = getTagCounts(scienceArticles);
 
   // Gộp tất cả tags
-  const allTags = Array.from(new Set([...sportTags, ...scienceTags]));
+  const allTagCounts = { ...sportTagCounts, ...scienceTagCounts };
 
   return (
     <>
@@ -210,7 +212,7 @@ const Footer = () => {
             <span> 1993992</span>
           </div>
           <div className='box'>
-            <h3>Thể thao</h3>
+            <h3>Kinh tế</h3>
             {sportsArticles.map((article, index) => (
               <div className='item' key={index}>
                 {article.content_blocks[1]?.src && (
@@ -221,7 +223,7 @@ const Footer = () => {
             ))}
           </div>
           <div className='box'>
-            <h3>Khoa học</h3>
+            <h3>Công nghệ</h3>
             {scienceArticles.map((article, index) => (
               <div className='item' key={index}>
                 {article.content_blocks[1]?.src && (
@@ -234,9 +236,9 @@ const Footer = () => {
           <div className='box'>
             <h3>Thẻ</h3>
             <ul>
-              {allTags.map((tag, index) => (
+              {Object.entries(allTagCounts).map(([tag, count], index) => (
                 <li key={index}>
-                  <span>{tag}</span> <label>(0)</label> {/* Số lượng bài viết cho mỗi tag có thể được cập nhật theo nhu cầu */}
+                  <span>{tag}</span> <label>({count})</label> {/* Hiển thị số lượng bài viết cho mỗi tag */}
                 </li>
               ))}
             </ul>
@@ -253,3 +255,4 @@ const Footer = () => {
 }
 
 export default Footer;
+

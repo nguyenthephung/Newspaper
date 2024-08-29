@@ -130,10 +130,8 @@ import "./interested.css";
 const Interested = () => {
   // Lấy dữ liệu bài viết từ Redux store
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
-
   // Lọc các bài báo theo category "fun"
-  const funArticles = articles.filter((val) => val.category=== "fun");
-
+  const funArticles = articles.filter((val) => val.category=== "Thể thao");
   const settings = {
     dots: true,
     className: "center",
@@ -163,7 +161,7 @@ const Interested = () => {
                         </div>
                       )) || null}
                       <div className='category category1'>
-                        <span>{val.category?.name}</span>
+                        <span>{val.category}</span>
                       </div>
                     </div>
                     <div className='text'>

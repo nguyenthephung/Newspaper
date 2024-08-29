@@ -16,7 +16,6 @@ const categoryController = {
         ...category._doc,
         tags: category.tags.map(tag => tag.name)
       }));
-
       res.json(categoriesWithTagNames);
     } catch (err) {
       res.status(400).json({ error: err.message });

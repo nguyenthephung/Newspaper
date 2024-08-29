@@ -35,15 +35,16 @@ const Article = () => {
   }, [articles]);
 
   const getCategoryNames = () => {
-    if (!categories) return [];
+    if (!categories || !Array.isArray(categories)) return [];
     return categories.map(category => category.name);
   };
-
+  
   const getTags = (categoryName) => {
-    if (!categories) return [];
+    if (!categories || !Array.isArray(categories)) return [];
     const category = categories.find(cat => cat.name === categoryName);
     return category ? category.tags : [];
   };
+  
 
   const handleAdd = () => {
     form.validateFields().then(values => {
@@ -137,16 +138,16 @@ const Article = () => {
           {
             title: "Category",
             dataIndex: "category",
-            render: (category) => <span>{category}</span>,
+            render: (category) => <span>{category || "Unknown"}</span>,
           },
           {
             title: "Tags",
             dataIndex: "tags",
             render: (tags) => (
               <ul>
-                {tags.map((tag, index) => (
-                  <li key={index}>{tag}</li>
-                ))}
+               {(tags || []).map((tag, index) => ( // Đảm bảo tags luôn là một mảng
+            <li key={index}>{tag}</li>
+          ))}
               </ul>
             ),
           },

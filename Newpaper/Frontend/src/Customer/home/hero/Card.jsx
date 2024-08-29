@@ -5,19 +5,13 @@ const Card = ({ item: { _id, title, content_blocks, author, category, tags, tota
   // Lấy thông tin hình ảnh từ các content block
   const coverImage = content_blocks.find(block => block.type === 'image')?.src || '';
 
-  // Hình ảnh dự phòng nếu không có hình ảnh từ bài viết
-  const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
-
   // Lấy ngày tạo bài viết theo định dạng
   const formattedDate = new Date(createdAt).toLocaleDateString();
 
   return (
     <div className='box'>
       <div className='img'>
-        <img
-          src={coverImage || fallbackImage}  // Sử dụng hình ảnh dự phòng nếu coverImage không tồn tại
-          alt='Article cover'
-        />
+        <img src={coverImage} alt='Article cover' />
       </div>
       <div className='text'>
         {/* Hiển thị danh mục */}
@@ -33,6 +27,7 @@ const Card = ({ item: { _id, title, content_blocks, author, category, tags, tota
         <div className='rating'>
           {/* Hiển thị tổng số điểm và số lượng đánh giá */}
           <span>Total Rating: {totalRating}</span>
+
           <span>. Rating Count: {ratingCount}</span>
         </div>
       </div>
@@ -41,4 +36,3 @@ const Card = ({ item: { _id, title, content_blocks, author, category, tags, tota
 };
 
 export default Card;
-

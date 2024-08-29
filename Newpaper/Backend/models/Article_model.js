@@ -12,15 +12,15 @@ const articleSchema = new Schema({
         }
     ],
     author: { type: String, required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category' }, 
-    tags: [{ type: Schema.Types.ObjectId, ref: 'Tags' }] ,
-    Comment: [{ type: Schema.Types.ObjectId, ref: 'Comment' }] ,
+    category: { type: String},
+    tags: [{ type: String }] ,
+    Comment: [{ type: Schema.Types.ObjectId, ref: 'comments' }] ,
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-    Publish: { type: Boolean, default: false },
+    publish: { type: Boolean, default: false },
     isRead: { type: Boolean, default: false },
     views: { type: Number, default: 0 }, 
     totalRating: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 }, 
-}, { timestamps: true });
+},  { timestamps: true });
 
-module.exports = mongoose.model('Article', articleSchema);
+module.exports = mongoose.model('articles', articleSchema);

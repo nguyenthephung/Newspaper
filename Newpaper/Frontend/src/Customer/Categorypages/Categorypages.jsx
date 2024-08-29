@@ -1,12 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, useParams, Link } from 'react-router-dom';
-import './Category.css';
+import { useParams, Link } from 'react-router-dom';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Side from "./sideCate/Side";
 import "../home/mainContent/homes/style.css";
 import "../home/sideContent/side/side.css";
+import './Category.css';
 import { useSelector } from "react-redux";
 
 const CategoryPage = () => {
@@ -15,7 +15,6 @@ const CategoryPage = () => {
   const { idcate, idtag } = useParams();
   const decodedCategory = decodeURIComponent(idcate);
   const decodedTag = decodeURIComponent(idtag);
-
   const category = categories.find(cat => cat.name === decodedCategory);
 
   if (!category) {
@@ -30,22 +29,19 @@ const CategoryPage = () => {
   );
 };
 
-const Navbar = ({ tags, category }) => {
-  return (
-    <nav className="navbar">
-      <ul className="navbar-list">
-        {tags.map((tag, index) => (
-          <li key={index} className="navbar-item">
-            <Link to={`/${category}/${tag}`} className="navbar-link">{tag}</Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-};
+const Navbar = ({ tags, category }) => (
+  <nav className="navbar">
+    <ul className="navbar-list">
+      {tags.map((tag, index) => (
+        <li key={index} className="navbar-item">
+          <Link to={`/${category}/${tag}`} className="navbar-link">{tag}</Link>
+        </li>
+      ))}
+    </ul>
+  </nav>
+);
 
 const Popular = ({ tag, articles }) => {
-  // Lọc bài viết theo tag
   const filteredArticles = articles.filter(article => article.tags.includes(tag));
   const settings = {
     className: "center",
@@ -55,7 +51,7 @@ const Popular = ({ tag, articles }) => {
     centerPadding: "0",
     slidesToShow: 2,
     speed: 500,
-    rows: 4,
+    rows: 1,
     slidesPerRow: 1,
     responsive: [
       {
@@ -76,11 +72,11 @@ const Popular = ({ tag, articles }) => {
           <Slider {...settings}>
             {filteredArticles.length > 0 ? (
               filteredArticles.map((val) => (
-                <div className='items' key={val.id}>
+                <div className='items' key={val._id}>
                   <div className='box shadow'>
                     <div className='images row'>
                       <div className='img'>
-                        <img src={val.cover} alt='' />
+                        <img src={val.content_blocks[1]?.src || 'default-image.jpg'} alt={val.content_blocks[1]?.alt || 'Article image'} />
                       </div>
                       <div className='category category1'>
                         {val.tags.length > 0 ? (
@@ -97,7 +93,7 @@ const Popular = ({ tag, articles }) => {
                     </div>
                     <div className='text row'>
                       <Link to={`/SinglePage/${val._id}`}>
-                        <h1 className='title'>{val.title.slice(0, 40)}...</h1>
+                        <h1 className='title'>{val.title}</h1>
                       </Link>
                       <div className='date'>
                         <i className='fas fa-calendar-days'></i>

@@ -207,7 +207,7 @@ const ArticleForm = () => {
             status:"pending",
             tags: selectedTags,
             content_blocks: contentBlocks,
-            published: isPublished
+            publish: isPublished
         };
         updateArticle(dispatch, article);
         navigate('/writer');  // Chuyển hướng sau khi lưu

@@ -1,17 +1,36 @@
 const Rating = require('../models/Rating_model');
-
+const User = require('../models/User_model');
+const Article = require('../models/Article_model');
 // Hàm lấy tất cả ratings chỉ trả về các trường userId, articleId, và ratingCount
 const getAllRatings = async (req, res) => {
     try {
-        const ratings = await Rating.find({}, 'user article ratingCount')
-            .populate('user', '_id')
-            .populate('article', '_id');
+        // Lấy tất cả các rating với các trường user, article, và ratingCount
+        const ratings = await Rating.find({}, 'user article ratingCount');
+
+        // Lấy tất cả các userId và articleId từ các ratings
+        const userIds = ratings.map(rating => rating.user);
+        const articleIds = ratings.map(rating => rating.article);
+
+        // Truy vấn để lấy thông tin các user và article tương ứng
+        const users = await User.find({ _id: { $in: userIds } }, '_id');
+        const articles = await Article.find({ _id: { $in: articleIds } }, '_id');
+
+        // Tạo một map để dễ dàng truy cập thông tin
+        const userMap = users.reduce((acc, user) => {
+            acc[user._id] = user._id;
+            return acc;
+        }, {});
+
+        const articleMap = articles.reduce((acc, article) => {
+            acc[article._id] = article._id;
+            return acc;
+        }, {});
 
         // Chuyển đổi kết quả để chỉ bao gồm các trường userId, articleId, và ratingCount
         const result = ratings.map(rating => ({
-            userId: rating.user._id,
-            articleId: rating.article._id,
-            ratingCount: rating.ratingCount,
+            userId: userMap[rating.user],         // Lấy ObjectId của user từ map
+            articleId: articleMap[rating.article], // Lấy ObjectId của article từ map
+            ratingCount: rating.ratingCount,      // Lấy số lượng rating
         }));
 
         res.status(200).json(result);

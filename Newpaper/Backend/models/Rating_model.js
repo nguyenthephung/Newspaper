@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ratingSchema = new Schema({
-    article: { type: Schema.Types.ObjectId, ref: 'Article', required: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    article: { type: Schema.Types.ObjectId, ref: 'articles', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'users', required: true },
     ratingCount: { type: Number, default: 0 }, 
   }, { timestamps: true });
   
-  module.exports = mongoose.model('Rating', ratingSchema);
+  module.exports = mongoose.model('ratings', ratingSchema);
   

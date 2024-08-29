@@ -5,67 +5,24 @@ const User = require('../models/User_model');
 const articleController = {
 
  
-    getAll: async (req, res) => {
-      try {
-        // Tìm tất cả các bài viết có trạng thái 'approved'
-        const articles = await Article.find({ status: 'approved' });
+  getAll: async (req, res) => {
+    try {
+      // Tìm tất cả các bài viết có trạng thái 'approved' và populate category và tags để thay thế ObjectId bằng name
+      const articles = await Article.find({ status: 'approved' })
+      res.json(articles);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  },
   
-        // Lấy tất cả các category ID từ các bài viết
-        const categoryIds = [...new Set(articles.map(article => article.category))];
-        // Lấy tất cả các tag ID từ các bài viết
-        const tagIds = [...new Set(articles.flatMap(article => article.tags))];
-  
-        // Tìm các category và tag theo ID
-        const categories = await Category.find({ _id: { $in: categoryIds } });
-        const tags = await Tag.find({ _id: { $in: tagIds } });
-  
-        // Tạo một map để tra cứu nhanh các category và tag theo ID
-        const categoryMap = new Map(categories.map(cat => [cat._id.toString(), cat.name]));
-        const tagMap = new Map(tags.map(tag => [tag._id.toString(), tag.name]));
-  
-        // Thay thế ID bằng tên trong danh sách bài viết
-        const articlesWithNames = articles.map(article => ({
-          ...article._doc,
-          category: categoryMap.get(article.category.toString()), // Thay thế ID bằng tên category
-          tags: article.tags.map(tagId => tagMap.get(tagId.toString())) // Thay thế ID bằng tên tag
-        }));
-  
-        res.json(articlesWithNames);
-      } catch (err) {
-        console.error(err);
-        res.status(400).json({ error: err.message });
-      }
-    },
     getAllPending: async (req, res) => {
       try {
-        // Tìm tất cả các bài viết có trạng thái 'approved'
-        const articles = await Article.find();
-  
-        // Lấy tất cả các category ID từ các bài viết
-        const categoryIds = [...new Set(articles.map(article => article.category))];
-        // Lấy tất cả các tag ID từ các bài viết
-        const tagIds = [...new Set(articles.flatMap(article => article.tags))];
-  
-        // Tìm các category và tag theo ID
-        const categories = await Category.find({ _id: { $in: categoryIds } });
-        const tags = await Tag.find({ _id: { $in: tagIds } });
-  
-        // Tạo một map để tra cứu nhanh các category và tag theo ID
-        const categoryMap = new Map(categories.map(cat => [cat._id.toString(), cat.name]));
-        const tagMap = new Map(tags.map(tag => [tag._id.toString(), tag.name]));
-  
-        // Thay thế ID bằng tên trong danh sách bài viết
-        const articlesWithNames = articles.map(article => ({
-          ...article._doc,
-          category: categoryMap.get(article.category.toString()), // Thay thế ID bằng tên category
-          tags: article.tags.map(tagId => tagMap.get(tagId.toString())) // Thay thế ID bằng tên tag
-        }));
-  
-        res.json(articlesWithNames);
+        // Tìm tất cả các bài viết có trạng thái 'approved' và populate category và tags để thay thế ObjectId bằng name
+        const articles = await Article.find({ status: 'pending' })
+        res.json(articles);
       } catch (err) {
-        console.error(err);
         res.status(400).json({ error: err.message });
-      } 
+      }
     },
    updateArticleStatus :async (req, res) => {
       try {
@@ -100,16 +57,10 @@ const articleController = {
     update: async (req, res) => {
       try {
         const { _id, category: categoryName, tags: tagNames, userId, ...articleData } = req.body;
+        console.log(req.body);
+          articleData.category = categoryName;
         
-        // Tìm Category và Tags theo tên
-        const category = categoryName ? await Category.findOne({ name: categoryName }) : null;
-        const tags = tagNames ? await Tag.find({ name: { $in: tagNames } }) : [];
-  
-        // Chuyển đổi Category và Tags thành ObjectId
-        if (category) {
-          articleData.category = category._id;
-        }
-        articleData.tags = tags.map(tag => tag._id);
+        articleData.tags = tagNames;
   
         let article;
         if (_id) {

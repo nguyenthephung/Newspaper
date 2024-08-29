@@ -6,5 +6,5 @@ const tagsSchema= new Schema({
     category :{type:String},
   }, { timestamps: true });
   
-  module.exports = mongoose.model('Tags', tagsSchema);
+  module.exports = mongoose.model('tags', tagsSchema);
   

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useLocation } from "react-router-dom";
 import { Rate } from 'antd';
 import Side from "../home/sideContent/side/Side";
 import "../home/mainContent/homes/style.css";
@@ -16,6 +16,11 @@ const SinglePage = () => {
   const [visibleComments, setVisibleComments] = useState(5);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.login?.currentUser);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // Cuộn về đầu trang
+  }, [pathname]);
   const article = useSelector((state) => 
     Array.isArray(state.article?.getArticle?.articles) 
       ? state.article.getArticle.articles.find(a => a._id === id) 
@@ -40,12 +45,12 @@ const SinglePage = () => {
   });
 
   const [currentUserRating, setCurrentUserRating] = useState(userRating);
-
+  const [averageRating, setAverageRating] = useState(article?.ratingCount > 0 ? article.totalRating / article.ratingCount : 0);
   useEffect(() => {
     getComment(dispatch);
     getRating(dispatch);
   }, [dispatch]);
-
+  
   useEffect(() => {
     setCurrentUserRating(userRating);
   }, [userRating]);
@@ -76,6 +81,9 @@ const SinglePage = () => {
     const updatedComment = {
       _id: commentId,
       content: updatedContent,
+      userId: user._id,
+      articleId: id,
+      user: user.username,
     };
     await updateComment(dispatch, updatedComment);
   };
@@ -115,21 +123,23 @@ const SinglePage = () => {
     const totalRating = ratings.reduce((sum, r) => sum + r.ratingCount, 0) + (existingRating ? value - existingRating.ratingCount : value);
     const ratingCount = ratings.length + (existingRating ? 0 : 1);
   
-    // Update the article with new rating data
+    // Create a new article object with updated rating data
     const updatedArticle = {
       ...article,
       totalRating: totalRating,
       ratingCount: ratingCount,
     };
+  
+    // Update the article in Redux store
     await updateArticle(dispatch, updatedArticle);
   
     // Reflect the new average rating immediately in the UI
     const newAverageRating = ratingCount > 0 ? totalRating / ratingCount : 0;
-    article.totalRating = totalRating;
-    article.ratingCount = ratingCount;
+    // Update local state if needed
+    // Note: You might want to update your Redux store instead, depending on your app's structure
+    setAverageRating(newAverageRating);
   };
   
-  const averageRating = article?.ratingCount > 0 ? article.totalRating / article.ratingCount : 0;
 
   const getShareUrl = (platform) => {
     const currentUrl = window.location.href;
@@ -274,7 +284,7 @@ const SinglePage = () => {
             </section>
           </div>
           <section>
-            <Suggest category={article.categories} />
+            <Suggest category={article.category} />
           </section>
         </main>
       ) : (

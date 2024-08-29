@@ -142,7 +142,7 @@ const Popular = () => {
     speed: 500,
     slidesToShow: 2,
     slidesToScroll: 1,
-    rows: 1,
+    rows: 4,
     slidesPerRow: 1,
     responsive: [
       {

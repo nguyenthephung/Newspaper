@@ -99,7 +99,6 @@ import "./publish.css";
 const Publish = () => {
   const articles = useSelector((state) => state.bookMaked?.getBookMaked?.bookMaked) || [];
   const user = useSelector((state) => state.auth?.login?.currentUser);
-  const navigate = useNavigate();
   const dispatch = useDispatch(); 
   useEffect(() => {
     if (user) {
@@ -117,7 +116,7 @@ const handleDelete = (id) => {
 
   // Lọc các bài viết đã xuất bản
   const publishedArticles = articles.filter(article =>
-    article.Publish === true );
+    article.publish === true );
 
 
   return (

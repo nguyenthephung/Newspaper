@@ -14,15 +14,15 @@ const userSchema = new Schema({
   preferences: {
     categories: [
       {
-        category: { type: Schema.Types.ObjectId, ref: 'Category' },
+        category: { type: Schema.Types.ObjectId, ref: 'categories' },
         tags: [String]
       }
     ]
   },
   Subscribe: { type: Boolean, default :false },
   notificationsEnabled: { type: Boolean, default: true },
-  bookmarkedArticles: [{ type: Schema.Types.ObjectId, ref: 'Article' }],
+  bookmarkedArticles: [{ type: Schema.Types.ObjectId, ref: 'articles' }],
   adFreeSubscription: { type: Boolean, default: false },
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('users', userSchema);

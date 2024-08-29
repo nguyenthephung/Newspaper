@@ -13,40 +13,58 @@ const tagController = {
 
   updateOrCreate: async (req, res) => {
     try {
-      const { _id, name, description, category } = req.body;
+        const { _id, name, description, category } = req.body;
 
-      let tag;
-      if (_id) {
-        // Nếu có ID, tìm kiếm tag trong cơ sở dữ liệu
-        tag = await Tag.findById(_id);
-      }
-
-      if (tag) {
-        // Nếu tìm thấy tag, cập nhật nó
-        tag.name = name;
-        tag.description = description;
-        tag.category = category;
-        await tag.save();
-      } else {
-        // Nếu không tìm thấy tag hoặc không có ID, tạo tag mới
-        tag = new Tag({ name, description, category});
-        await tag.save();
-      }
-
-      // Cập nhật trường tags trong Category
-      const categories = await Category.findOne({ name: category});
-      if (categories) {
-        if (!categories.tags.includes(tag._id)) {
-          categories.tags.push(tag._id);
+        // Kiểm tra tag trùng tên
+        const existingTag = await Tag.findOne({ name });
+        if (existingTag && (! _id || existingTag._id.toString() !== _id)) {
+            return res.status(400).json({ error: 'Tag with this name already exists' });
         }
-        await categories.save();
-      }
 
-      res.json(tag);
+        let tag;
+        if (_id) {
+            // Nếu có ID, tìm kiếm tag trong cơ sở dữ liệu
+            tag = await Tag.findById(_id);
+        }
+
+        if (tag) {
+            // Nếu tìm thấy tag, cập nhật nó
+            tag.name = name;
+            tag.description = description;
+            tag.category = category;
+            await tag.save();
+        } else {
+            // Nếu không tìm thấy tag hoặc không có ID, tạo tag mới
+            tag = new Tag({ name, description, category });
+            await tag.save();
+        }
+
+        // Cập nhật trường tags trong Category
+        if (category) {
+            const categoryDoc = await Category.findOne({ name: category });
+
+            if (categoryDoc) {
+                // Đảm bảo không có tag trùng trong category
+                if (!categoryDoc.tags.includes(tag._id.toString())) {
+                    categoryDoc.tags.push(tag._id);
+                    await categoryDoc.save();
+                }
+            } else {
+                // Nếu không tìm thấy category, có thể tạo mới hoặc xử lý tùy ý
+                const newCategory = new Category({
+                    name: category,
+                    tags: [tag._id]
+                });
+                await newCategory.save();
+            }
+        }
+
+        res.json(tag);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+        res.status(400).json({ error: err.message });
     }
-  },
+},
+
 
   delete: async (req, res) => {
     try {

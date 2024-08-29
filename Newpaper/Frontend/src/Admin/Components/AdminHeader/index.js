@@ -13,12 +13,11 @@ function AdminHeader() {
   const dispatch = useDispatch();
 
   const adminInfo = useSelector((state) => state.auth?.login?.currentUser);
-  const articlesPending = useSelector((state) => state.article?.getArticlePending?.articlesPending) || [];
+  const articlesPending = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
   const comments = useSelector((state) => state.comment?.getComment?.comments) || [];
-
   // Lọc những comment và bài viết chưa được đọc
   const unreadComments = comments.filter((comment) => !comment.isRead);
-  const pendingArticles = articlesPending.filter((article) => article.status === 'pending'); // Lọc các bài viết có trạng thái pending
+  const pendingArticles = articlesPending.filter((article) => article.status === 'pending'&& article.publish == true); // Lọc các bài viết có trạng thái pending
 
   useEffect(() => {
     getComment(dispatch);

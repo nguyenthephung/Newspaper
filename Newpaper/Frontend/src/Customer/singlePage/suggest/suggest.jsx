@@ -177,7 +177,7 @@
 // export default Suggest;
 
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Slider from "react-slick";
 import Heading from "../../common/heading/Heading";
@@ -192,10 +192,16 @@ const Suggest = ({ category }) => {
   // Lấy dữ liệu từ Redux store
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
-  // Lọc bài viết theo category và ID
-  const filteredPosts = articles.filter((post) => 
-    post.category === category && post.id === id
-  );
+  // Tạo state để lưu trữ bài viết đã lọc
+  const [filteredPosts, setFilteredPosts] = useState([]);
+
+  // Sử dụng useEffect để lọc lại bài viết mỗi khi id hoặc articles thay đổi
+  useEffect(() => {
+    const posts = articles.filter((post) => 
+      post.category === category && post.id !== id
+    );
+    setFilteredPosts(posts);
+  }, [id, articles, category]);
 
   // Cấu hình của slider
   const settings = {
@@ -204,6 +210,7 @@ const Suggest = ({ category }) => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
+    adaptiveHeight: true,
     responsive: [
       {
         breakpoint: 800,
@@ -255,7 +262,7 @@ const Suggest = ({ category }) => {
                     </div>
                     <div className="text">
                       <h1 className="title">
-                        <Link to={`/SinglePage/${post.id}`}>{post.title.slice(0, 40)}...</Link>
+                        <Link to={`/SinglePage/${post._id}`}>{post.title.slice(0, 40)}...</Link>
                       </h1>
                       <div className="date">
                         <i className="fas fa-calendar-days"></i>
