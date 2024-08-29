@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, memo } from "react";
+import { useParams, Link ,useLocation} from 'react-router-dom';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -16,20 +16,26 @@ const CategoryPage = () => {
   const decodedCategory = decodeURIComponent(idcate);
   const decodedTag = decodeURIComponent(idtag);
   const category = categories.find(cat => cat.name === decodedCategory);
-
+  const { pathname } = useLocation();
+  
   if (!category) {
     return <div>Category not found</div>;
   }
 
+  useEffect(() => {
+    window.scrollTo(0, 0); // Cuộn về đầu trang
+  }, [pathname]);
+
   return (
     <div className="category-page">
-      <Navbar tags={category.tags} category={category.name} />
-      <Popular tag={decodedTag} articles={articles} />
+      <MemoizedNavbar tags={category.tags} category={category.name} />
+      <MemoizedPopular tag={decodedTag} articles={articles} />
     </div>
   );
 };
 
-const Navbar = ({ tags, category }) => (
+// Memoized Navbar to prevent unnecessary re-renders
+const MemoizedNavbar = memo(({ tags, category }) => (
   <nav className="navbar">
     <ul className="navbar-list">
       {tags.map((tag, index) => (
@@ -39,9 +45,10 @@ const Navbar = ({ tags, category }) => (
       ))}
     </ul>
   </nav>
-);
+));
 
-const Popular = ({ tag, articles }) => {
+// Memoized Popular to prevent unnecessary re-renders
+const MemoizedPopular = memo(({ tag, articles }) => {
   const filteredArticles = articles.filter(article => article.tags.includes(tag));
   const settings = {
     className: "center",
@@ -118,9 +125,10 @@ const Popular = ({ tag, articles }) => {
       </div>
     </section>
   );
-};
+});
 
 export default CategoryPage;
+
 
 // import React from 'react';
 // import { BrowserRouter as Router, Route, useParams, Link } from 'react-router-dom';

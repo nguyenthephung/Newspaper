@@ -33,15 +33,15 @@ function AdminHeader() {
   };
 
   const handleAdminInfoUpdate = (values) => {
-    const updatedValues = {
-      ...adminInfo,
+    const updatedUser = {
+      ...user,
       ...values,
-    };
-    updateUser(dispatch, updatedValues);
-    dispatch(updateUserInfo(updatedValues))
+      password: values.password ? values.password : user.password,
+  };
+  updateUser(dispatch, updatedUser);
     closeAdminInfoDrawer();
   };
-
+  
   return (
     <div className="AppHeader">
       <Avatar

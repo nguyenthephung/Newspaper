@@ -163,35 +163,44 @@ const Popular = () => {
         <div className='content'>
           <Slider {...settings}>
             {sortedPopular.length > 0 ? (
-              sortedPopular.map((val) => (
-                <div className='items' key={val._id}>
-                  <div className='box shadow'>
-                    <div className='images row'>
-                      {val.content_blocks?.filter(block => block.type === 'image').map((block, index) => (
-                        <div className='img' key={index}>
-                          <img src={block.src} alt={block.alt || "Image"} />
+              sortedPopular.map((val) => {
+                // Tìm ảnh đầu tiên
+                const firstImageBlock = val.content_blocks?.find(block => block.type === 'image');
+                
+                return (
+                  <div className='items' key={val._id}>
+                    <div className='box shadow'>
+                      <div className='images row'>
+                        {/* Chỉ hiển thị ảnh đầu tiên */}
+                        {firstImageBlock && (
+                          <div className='img'>
+                            <img 
+                              src={firstImageBlock.src} 
+                              alt={firstImageBlock.alt || "Image"} 
+                            />
+                          </div>
+                        )}
+                        <div className='category category1'>
+                          <span>{val.category?.name || val.category || 'Unknown Category'}</span>
                         </div>
-                      )) || null}
-                      <div className='category category1'>
-                        <span>{val.category?.name || val.category || 'Unknown Category'}</span>
                       </div>
-                    </div>
-                    <div className='text row'>
-                      <Link to={`/SinglePage/${val._id}`}>
-                        <h1 className='title'>{val.title?.slice(0, 40) || 'No Title'}...</h1>
-                      </Link>
-                      <div className='date'>
-                        <i className='fas fa-calendar-days'></i>
-                        <label>{val.createdAt ? new Date(val.createdAt).toLocaleDateString() : 'Unknown Date'}</label>
-                      </div>
-                      <div className='views'>
-                        <i className='fas fa-eye'></i>
-                        <label>{val.views || 0} views</label>
+                      <div className='text row'>
+                        <Link to={`/SinglePage/${val._id}`}>
+                          <h1 className='title'>{val.title?.slice(0, 40) || 'No Title'}...</h1>
+                        </Link>
+                        <div className='date'>
+                          <i className='fas fa-calendar-days'></i>
+                          <label>{val.createdAt ? new Date(val.createdAt).toLocaleDateString() : 'Unknown Date'}</label>
+                        </div>
+                        <div className='views'>
+                          <i className='fas fa-eye'></i>
+                          <label>{val.views || 0} views</label>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p>Không có bài báo phổ biến nào.</p>
             )}

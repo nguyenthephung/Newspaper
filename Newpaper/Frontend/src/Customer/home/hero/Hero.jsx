@@ -84,7 +84,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Card from './Card'; // Giả sử bạn đã định nghĩa Card ở đâu đó
-
+import "./hero.css"
 const Hero = () => {
   // Lấy dữ liệu từ Redux store
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];

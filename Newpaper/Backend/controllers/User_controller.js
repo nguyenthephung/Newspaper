@@ -27,7 +27,7 @@ const userController = {
         isAdmin: user.isAdmin,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "10m" }
+      { expiresIn: "100d" }
     );
   },
 
@@ -68,8 +68,8 @@ const userController = {
           path: "/",
           sameSite: "strict",
         });
-        const { password, ...others } = user._doc;
-        res.status(200).json({ ...others, accessToken, refreshToken });
+        res.status(200).json({ ...user._doc, accessToken, refreshToken });
+
       }
     } catch (err) {
       res.status(500).json(err);
@@ -136,36 +136,45 @@ const userController = {
   },
 
 
-updateOrCreate: async (req, res) => {
-  try {
-    const { _id, password, ...userData } = req.body;
-
-    // Băm mật khẩu nếu có
-    if (password) {
-      const saltRounds = 10; // Số vòng băm
-      userData.password = await bcrypt.hash(password, saltRounds);
-    }
-
-    let user;
-    if (_id) {
-      // Nếu có _id, tìm user để cập nhật
-      user = await User.findById(_id);
-      if (user) {
-        // Cập nhật người dùng nếu tồn tại
-        user = await User.findByIdAndUpdate(_id, userData, { new: true, runValidators: true });
-        return res.json({ message: 'User updated', user });
+  updateOrCreate: async (req, res) => {
+    try {
+      const { _id, password, ...userData } = req.body;
+  
+      if (password) {
+        // Kiểm tra nếu mật khẩu đã được băm hay chưa
+        const isHashed = password.startsWith('$2b$') || password.startsWith('$2a$');
+  
+        // Nếu mật khẩu chưa được băm, thực hiện băm
+        if (!isHashed) {
+          const saltRounds = 10; // Số vòng băm
+          userData.password = await bcrypt.hash(password, saltRounds);
+        } else {
+          // Nếu mật khẩu đã được băm, giữ nguyên
+          userData.password = password;
+        }
       }
+  
+      let user;
+      if (_id) {
+        // Nếu có _id, tìm user để cập nhật
+        user = await User.findById(_id);
+        if (user) {
+          // Cập nhật người dùng nếu tồn tại
+          user = await User.findByIdAndUpdate(_id, userData, { new: true, runValidators: true });
+          return res.json({ message: 'User updated', user });
+        }
+      }
+      
+      // Nếu không có _id hoặc không tìm thấy user, tạo mới
+      user = new User(userData);
+      await user.save();
+      return res.status(201).json({ message: 'User created', user });
+    } catch (err) {
+      console.error("Error in updateOrCreate:", err);
+      return res.status(400).json({ error: err.message });
     }
-    
-    // Nếu không có _id hoặc không tìm thấy user, tạo mới
-    user = new User(userData);
-    await user.save();
-    return res.status(201).json({ message: 'User created', user });
-  } catch (err) {
-    console.error("Error in updateOrCreate:", err);
-    return res.status(400).json({ error: err.message });
   }
-}
+  
   
   
   

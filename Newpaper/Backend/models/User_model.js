@@ -11,14 +11,7 @@ const userSchema = new Schema({
     google: { type: String },
     phoneNumber: { type: String }
   },
-  preferences: {
-    categories: [
-      {
-        category: { type: Schema.Types.ObjectId, ref: 'categories' },
-        tags: [String]
-      }
-    ]
-  },
+  preferences: [{type: String}],
   Subscribe: { type: Boolean, default :false },
   notificationsEnabled: { type: Boolean, default: true },
   bookmarkedArticles: [{ type: Schema.Types.ObjectId, ref: 'articles' }],

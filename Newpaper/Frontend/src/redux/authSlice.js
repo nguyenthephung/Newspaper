@@ -72,6 +72,7 @@ const authSlice = createSlice({
                     ...action.payload, // Cập nhật thông tin mới
                 };
             }
+            console.log(state.login.currentUser);
         },
     
     }

@@ -178,7 +178,7 @@ const Searchpage = () => {
     centerPadding: "0",
     slidesToShow: 1,
     speed: 500,
-    rows: 2,
+    rows: 10,
     slidesPerRow: 1,
   };
 
@@ -203,20 +203,20 @@ const Searchpage = () => {
                 val.title.toLowerCase().includes(searchQuery.toLowerCase())
               ) // Lọc theo searchQuery
               .map((val) => {
-                // Kiểm tra xem val.content_blocks có phải là mảng không
-                const contentBlocks = Array.isArray(val.content_blocks) ? val.content_blocks : [];
+                // Lấy ảnh đầu tiên từ content_blocks
+                const firstImageBlock = Array.isArray(val.content_blocks)
+                  ? val.content_blocks.find((block) => block.type === "image")
+                  : null;
 
                 return (
                   <div className='items' key={val._id}>
                     <div className='box shadow flexSB'>
                       <div className='images'>
-                        {contentBlocks
-                          .filter((block) => block.type === "image")
-                          .map((block, index) => (
-                            <div className='img' key={index}>
-                              <img src={block.src} alt={block.alt || ''} />
-                            </div>
-                          ))}
+                        {firstImageBlock && (
+                          <div className='img'>
+                            <img src={firstImageBlock.src} alt={firstImageBlock.alt || 'Article image'} />
+                          </div>
+                        )}
                         <div className='category category1'>
                           <span>{val.category?.name || 'No category'}</span>
                         </div>
@@ -232,9 +232,7 @@ const Searchpage = () => {
                           <label>{new Date(val.createdAt).toLocaleDateString()}</label>
                         </div>
                         <p className='desc'>
-                          {contentBlocks.find(
-                            (block) => block.type === "paragraph"
-                          )?.content.slice(0, 250)}
+                          {val.content_blocks.find((block) => block.type === "paragraph")?.content.slice(0, 250)}
                           ...
                         </p>
                         <div className='comment'>
@@ -256,5 +254,3 @@ const Searchpage = () => {
 };
 
 export default Searchpage;
-
-

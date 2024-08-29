@@ -232,7 +232,7 @@ const Popular = () => {
                           />
                         </div>
                         <div className="category category1">
-                          <span>{val.category?.name || 'Unknown Category'}</span>
+                          <span>{val.category || 'Unknown Category'}</span>
                         </div>
                       </div>
                       <div className="text row">

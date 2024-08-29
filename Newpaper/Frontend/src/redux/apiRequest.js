@@ -10,6 +10,7 @@ import {
   registerFailed,
   registerStart,
   registerSuccess,
+  updateUserInfo
 } from "./authSlice";
 import {
   deleteUserFailed,
@@ -130,10 +131,10 @@ export const getAllUsers = async (dispatch) => {
     dispatch(getUsersFailed());
   }
 };
-export const updateUser = async (user) => {
+export const updateUser = async (dispatch,user) => {
   try {
-    console.log(user);
     const response = await axios.post("/v1/user/updateUser", user);
+     dispatch(updateUserInfo(user));
     return {
       success: true,
       data: response.data,
@@ -315,7 +316,6 @@ export const getComment = async (dispatch) => {
   dispatch(getCommentStart());
   try {
     const res = await axios.get("/v1/comment/getComment");
-    console.log(res.data);
     dispatch(getCommentSuccess(res.data));
   } catch (err) {
     dispatch(getCommentFailed());

@@ -50,7 +50,7 @@ const articleController = {
           article
         });
       } catch (error) {
-        console.error(error);
+  
         return res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật trạng thái bài viết' });
       }
     },
@@ -95,7 +95,7 @@ const articleController = {
   
         res.json(article);
       } catch (err) {
-        console.error(err);
+    
         res.status(500).json({ error: err.message });
       }
     },

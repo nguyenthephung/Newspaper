@@ -162,6 +162,7 @@ import { updateUser, logOut } from '../../redux/apiRequest';
 import { createAxios } from '../../createInstance';
 import { loginSuccess } from '../../redux/authSlice';
 import { updateUserInfo } from '../../redux/authSlice';
+
 const { Option } = Select;
 
 const UserInfo = () => {
@@ -171,16 +172,21 @@ const UserInfo = () => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
     const navigate = useNavigate();
- let axiosJWT = createAxios(user, dispatch, loginSuccess)
+    let axiosJWT = createAxios(user, dispatch, loginSuccess);
+
     const handleLogout = () => {
-        logOut(dispatch,navigate, user?._id,user?.accessToken,axiosJWT);
+        logOut(dispatch, navigate, user?._id, user?.accessToken, axiosJWT);
     };
 
     const handleUpdateInfo = (values) => {
-        console.log('Updated user info:', values);
-        const updatedUser = { ...user, ...values };
+        // Nếu password không được nhập, giữ nguyên mật khẩu cũ
+        const updatedUser = {
+            ...user,
+            ...values,
+            password: values.password ? values.password : user.password,
+            preferences: values.categories  // Cập nhật preferences từ categories đã chọn
+        };
         updateUser(dispatch, updatedUser);
-        dispatch(updateUserInfo (updatedUser))
         setEditModalVisible(false);
     };
 
@@ -188,7 +194,7 @@ const UserInfo = () => {
         form.setFieldsValue({
             username: user?.username || '',
             email: user?.email || '',
-            categories: user?.preferences?.categories?.map(c => c.category) || []
+            categories: user?.preferences || []  // Sử dụng trực tiếp preferences
         });
         setEditModalVisible(true);
     };
@@ -209,11 +215,15 @@ const UserInfo = () => {
             <p className="user-email">Username: {user.username}</p>
             <p className="user-detail">Email: {user.email}</p>
             <p className="user-detail">Danh mục yêu thích: 
-                {user.preferences?.categories?.map((cat, index) => (
-                    <span key={index} className="user-category">
-                        {cat.category}{index < user.preferences.categories.length - 1 ? ', ' : ''}
-                    </span>
-                ))}
+                {Array.isArray(user?.preferences) && user.preferences.length > 0 ? (
+                    user.preferences.map((pref, index) => (
+                        <span key={index} className="user-category">
+                            {pref}{index < user.preferences.length - 1 ? ', ' : ''}
+                        </span>
+                    ))
+                ) : (
+                    <span>No preferences</span>
+                )}
             </p>
             
             <ul className="user-links">
@@ -239,6 +249,13 @@ const UserInfo = () => {
                         <Input />
                     </Form.Item>
                     <Form.Item
+            name="password"
+            label="New Password"
+            rules={[{ required: false }]}  // Không bắt buộc nhập
+        >
+            <Input.Password />
+        </Form.Item>
+                    <Form.Item
                         name="email"
                         label="Email"
                         rules={[{ required: true, message: 'Please input your email!' }]}
@@ -246,24 +263,23 @@ const UserInfo = () => {
                         <Input />
                     </Form.Item>
                     <Form.Item
-                     style={{ width: '300px' }} 
-                        name="categories"
-                        label="Categories"
-                        rules={[{ required: true, message: 'Please select your categories!' }]}
-                    >
-                     <Select 
-    mode="multiple" 
-    placeholder="Select categories" 
-    className="w-full h-12 text-lg"
+  name="categories"
+  label="Categories"
+  style={{ width: '300px' }}
+  rules={[{ required: true, message: 'Please select your categories!' }]}
 >
+  <Select
+    mode="multiple"
+    placeholder="Select categories"
+    className="w-full h-12 text-lg"
+  >
     {categories && categories.map(category => (
-        <Option  style={{ width: '300px' }}  key={category.name} value={category.name}>
-            {category.name}
-        </Option>
+      <Option style={{ width: '300px' }} key={category.name} value={category.name}>
+        {category.name}
+      </Option>
     ))}
-</Select>
-
-                    </Form.Item>
+  </Select>
+</Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
                             Save

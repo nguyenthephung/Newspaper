@@ -132,18 +132,16 @@ import Heading from "../../../../common/heading/Heading";
 import "../Ppost/ppost.css";
 
 const ForYou = () => {
-  // Lấy dữ liệu bài viết và danh mục yêu thích từ Redux store
+  // Lấy dữ liệu người dùng và bài viết từ Redux store
   const user = useSelector((state) => state.auth?.login?.currentUser);
-
-  // Extract favorite categories from the user's preferences
-  const userFavoriteCategories = user?.preferences?.categories?.map(pref => pref.category.toString()) || [];
-
-  // Lấy dữ liệu bài viết từ Redux store (giả sử bạn có cách lấy dữ liệu này từ Redux store)
   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
 
-  // Filter articles based on the user's favorite categories and sort by views
+  // Lấy danh sách sở thích người dùng
+  const userFavoriteCategories = Array.isArray(user?.preferences) ? user.preferences : [];
+
+  // Lọc và sắp xếp bài viết theo sở thích người dùng
   const filteredAndSortedFavorites = articles
-    .filter(article => userFavoriteCategories.includes(article.category?.toString() || '')) // Ensure category comparison consistency
+    .filter(article => userFavoriteCategories.includes(article.category))
     .sort((a, b) => b.views - a.views);
 
   const settings = {
@@ -170,35 +168,40 @@ const ForYou = () => {
         <div className='content'>
           <Slider {...settings}>
             {filteredAndSortedFavorites.length > 0 ? (
-              filteredAndSortedFavorites.map((val) => (
-                <div className='items' key={val._id}>
-                  <div className='box shadow'>
-                    <div className='images'>
-                      <div className='img'>
-                        {val.content_blocks?.filter(block => block.type === 'image').map((block, index) => (
-                          <div className='img' key={index}>
-                            <img src={block.src} alt={block.alt} />
-                          </div>
-                        ))}
+              filteredAndSortedFavorites.map((val) => {
+                const firstImageBlock = val.content_blocks?.find(block => block.type === 'image');
+                return (
+                  <div className='items' key={val._id}>
+                    <div className='box shadow'>
+                      <div className='images'>
+                        <div className='img' style={{ height: '200px', overflow: 'hidden' }}>
+                          {firstImageBlock && (
+                            <img
+                              src={firstImageBlock.src}
+                              alt={firstImageBlock.alt || 'Article image'}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          )}
+                        </div>
+                        <div className='category category1'>
+                          <span>{val.category}</span>
+                        </div>
                       </div>
-                      <div className='category category1'>
-                        <span>{val.category}</span>
-                      </div>
-                    </div>
-                    <div className='text'>
-                      <h1 className='title'>
-                        <Link to={`/SinglePage/${val._id}`}>
-                          {val.title?.slice(0, 40)}...
-                        </Link>
-                      </h1>
-                      <div className='date'>
-                        <i className='fas fa-calendar-days'></i>
-                        <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+                      <div className='text'>
+                        <h1 className='title'>
+                          <Link to={`/SinglePage/${val._id}`}>
+                            {val.title?.slice(0, 40)}...
+                          </Link>
+                        </h1>
+                        <div className='date'>
+                          <i className='fas fa-calendar-days'></i>
+                          <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p>Không có bài báo nào cho danh mục yêu thích của bạn.</p>
             )}
