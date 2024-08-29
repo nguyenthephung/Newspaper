@@ -1,4 +1,6 @@
 const User = require('../models/User_model');
+const Article = require('../models/Article_model');
+const sendEmail = require('./node_mailer');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 let refreshTokens = [];
@@ -174,10 +176,72 @@ const userController = {
       return res.status(400).json({ error: err.message });
     }
   }
+  ,
+  updateUserSubscription :async (req, res) => {
+    try {
+      const userId = req.body.userId;
+  
+      // Kiểm tra nếu _id không được cung cấp
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+  
+      // Tìm người dùng theo _id và cập nhật trường Subscribe
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: userId, Subscribe: false }, // Điều kiện tìm kiếm
+        { $set: { Subscribe: true } },     // Cập nhật trường Subscribe thành true
+        { new: true }                      // Trả về bản ghi đã được cập nhật
+      );
+  
+      // Kiểm tra xem người dùng có được tìm thấy không
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found or already subscribed' });
+      }
+  
+      // Trả về người dùng đã được cập nhật
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error('Error updating user subscription:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
   
   
+publishArticle : async (req, res) => {
+    try {
+      const { articleId } = req.body;
   
+      // Tìm bài viết theo ID
+      const article = await Article.findById(articleId);
+      if (!article) {
+        return res.status(404).json({ message: 'Article not found' });
+      }
   
+      // Xác nhận rằng bài viết đã được duyệt (thực hiện các bước cần thiết để duyệt bài viết)
+      // ...
+  
+      // Tìm tất cả người dùng có Subscribe là true
+      const subscribers = await User.find({ Subscribe: true });
+  
+      if (subscribers.length === 0) {
+        return res.status(404).json({ message: 'No subscribers found' });
+      }
+  
+      // Gửi email cho tất cả các tài khoản
+      for (const subscriber of subscribers) {
+        await sendEmail(
+          subscriber.email,
+          'New Article Published',
+          `A new article titled "${article.title}" has been published. Check it out!`
+        );
+      }
+  
+      res.status(200).json({ message: 'Emails sent successfully' });
+    } catch (error) {
+      console.error('Error publishing article and sending emails:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
 };
 
 module.exports = userController;

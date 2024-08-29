@@ -93,9 +93,41 @@ const deleteCommentById = async (req, res) => {
   }
 };
 
+const markCommentsAsRead = async (req, res) => {
+  try {
+    const { commentIds } = req.body; // Một mảng chứa các ID của bình luận cần cập nhật
+
+    // Kiểm tra xem commentIds có phải là mảng hợp lệ không
+    if (!Array.isArray(commentIds) || commentIds.length === 0) {
+      return res.status(400).json({ message: 'Invalid comment IDs.' });
+    }
+
+    // Kiểm tra tất cả commentIds có hợp lệ không
+    const invalidIds = commentIds.filter(id => !mongoose.Types.ObjectId.isValid(id));
+    if (invalidIds.length > 0) {
+      return res.status(400).json({ message: 'Invalid ObjectId(s) in comment IDs.' });
+    }
+
+    // Cập nhật trạng thái isRead của các bình luận
+    const result = await Comment.updateMany(
+      { _id: { $in: commentIds } },
+      { $set: { isRead: true } }
+    );
+
+    res.status(200).json({ message: 'Comments updated successfully.', result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
 module.exports = {
   getAllComments,
   updateOrCreateComment,
   deleteCommentById,
   updateOrCreateComment,
+  markCommentsAsRead,
 };

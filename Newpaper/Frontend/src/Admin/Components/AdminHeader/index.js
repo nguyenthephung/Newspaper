@@ -2,8 +2,8 @@ import { Avatar, Badge, Drawer, List, Space, Typography, Form, Input, Button } f
 import { BellFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import { updateUser, getComment, getArticlePending } from "../../../redux/apiRequest";
-import { updateUserInfo} from "../../../redux/authSlice"
 import "./header.css";
 
 function AdminHeader() {
@@ -15,9 +15,10 @@ function AdminHeader() {
   const adminInfo = useSelector((state) => state.auth?.login?.currentUser);
   const articlesPending = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
   const comments = useSelector((state) => state.comment?.getComment?.comments) || [];
+  
   // Lọc những comment và bài viết chưa được đọc
   const unreadComments = comments.filter((comment) => !comment.isRead);
-  const pendingArticles = articlesPending.filter((article) => article.status === 'pending'&& article.publish == true); // Lọc các bài viết có trạng thái pending
+  const pendingArticles = articlesPending.filter((article) => article.status === 'pending' && article.publish === true&&article.isRead ===false);
 
   useEffect(() => {
     getComment(dispatch);
@@ -34,14 +35,63 @@ function AdminHeader() {
 
   const handleAdminInfoUpdate = (values) => {
     const updatedUser = {
-      ...user,
+      ...adminInfo,
       ...values,
-      password: values.password ? values.password : user.password,
-  };
-  updateUser(dispatch, updatedUser);
+      password: values.password ? values.password : adminInfo.password,
+    };
+    updateUser(dispatch, updatedUser);
     closeAdminInfoDrawer();
   };
+
+  // Gọi API để đánh dấu tất cả bình luận là đã đọc
+  const markCommentsAsRead = async (comments) => {
+    try {
+      const commentIds = comments.map(comment => comment._id);
+      if (commentIds.length > 0) {
+        await axios.post("/v1/comment/markAsRead", { commentIds });
+        // Sau khi thành công, làm mới danh sách bình luận
+        await getComment(dispatch);
+      }
+    } catch (error) {
+      console.error("Failed to update comments as read:", error);
+    }
+  };
+
+  // Gọi API để đánh dấu tất cả bài viết là đã đọc
+  const markArticlesAsRead = async (articles) => {
+    try {
+      const articleIds = articles.map(article => article._id);
+      if (articleIds.length > 0) {
+        await axios.post("/v1/article/markAsRead", { articleIds });
+        // Sau khi thành công, làm mới danh sách bài viết
+        await getArticlePending(dispatch);
+      }
+    } catch (error) {
+      console.error("Failed to update articles as read:", error);
+    }
+  };
+
+  const openCommentsDrawer = async () => {
+    setCommentsOpen(true);
+    // Đánh dấu tất cả bình luận là đã đọc
+    await markCommentsAsRead(unreadComments);
+    // Làm mới dữ liệu sau khi API gọi thành công
+    const updatedComments = await getComment(dispatch);
+    // Kiểm tra xem có cập nhật đúng cách không
+    console.log("Updated Comments: ", updatedComments);
+  };
   
+  const openNotificationsDrawer = async () => {
+    setNotificationsOpen(true);
+    // Đánh dấu tất cả thông báo là đã đọc
+    await markArticlesAsRead(pendingArticles);
+    // Làm mới dữ liệu sau khi API gọi thành công
+    const updatedArticles = await getArticlePending(dispatch);
+    // Kiểm tra xem có cập nhật đúng cách không
+    console.log("Updated Articles: ", updatedArticles);
+  };
+  
+
   return (
     <div className="AppHeader">
       <Avatar
@@ -58,17 +108,13 @@ function AdminHeader() {
         <Badge count={unreadComments.length} dot>
           <MailOutlined
             style={{ fontSize: 24 }}
-            onClick={() => {
-              setCommentsOpen(true);
-            }}
+            onClick={openCommentsDrawer}
           />
         </Badge>
         <Badge count={pendingArticles.length}>
           <BellFilled
             style={{ fontSize: 24 }}
-            onClick={() => {
-              setNotificationsOpen(true);
-            }}
+            onClick={openNotificationsDrawer}
           />
         </Badge>
       </Space>
@@ -79,7 +125,7 @@ function AdminHeader() {
         maskClosable
       >
         <List
-          dataSource={unreadComments}
+          dataSource={comments}
           renderItem={(item) => (
             <List.Item>
               <Typography.Text strong>{item.user}</Typography.Text>: {item.content}

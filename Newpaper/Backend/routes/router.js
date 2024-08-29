@@ -19,7 +19,7 @@ router.post('/auth/refresh', userController.requestRefreshToken);
 router.get('/user', userController.getAll);
 router.post('/user/updateUser', userController.updateOrCreate);
 router.delete('/user/:id',userController.delete)
-
+router.post('/user/subscribe',userController.updateUserSubscription)
 // Article routes
 router.get('/article/getArticle', articleController.getAll);
 router.post('/article/updateArticle',articleController.update);
@@ -47,5 +47,10 @@ router.delete('/comment/:id', commentController.deleteCommentById);
  router.get('/rating/getRating', ratingController.getAllRatings);
  router.post('/rating/updateRating', ratingController.updateOrCreateRating);
 
+//Email
+router.post('/sendEmail',userController.publishArticle);
 
+//Notification
+router.post('/comment/markAsRead',commentController.markCommentsAsRead)
+router.post('/article/markAsRead',articleController.markArticlesAsRead)
 module.exports = router;

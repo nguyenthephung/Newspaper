@@ -1,7 +1,7 @@
 const Article = require('../models/Article_model');
-const Category = require('../models/Category_model');
-const Tag = require('../models/Tag_model');
 const User = require('../models/User_model');
+const mongoose = require('mongoose');
+
 const articleController = {
 
  
@@ -17,7 +17,6 @@ const articleController = {
   
     getAllPending: async (req, res) => {
       try {
-        // Tìm tất cả các bài viết có trạng thái 'approved' và populate category và tags để thay thế ObjectId bằng name
         const articles = await Article.find({ status: 'pending' })
         res.json(articles);
       } catch (err) {
@@ -139,7 +138,34 @@ const articleController = {
       } catch (error) {
         res.status(500).json({ message: 'Server error' });
       }
+    },
+
+ markArticlesAsRead :async (req, res) => {
+      try {
+        const { articleIds } = req.body; // Một mảng chứa các ID của bài viết cần cập nhật
+    
+        // Kiểm tra xem articleIds có phải là mảng hợp lệ không
+        if (!Array.isArray(articleIds) || articleIds.length === 0) {
+          return res.status(400).json({ message: 'Invalid article IDs.' });
+        }
+    
+        // Kiểm tra tất cả articleIds có hợp lệ không
+        const invalidIds = articleIds.filter(id => !mongoose.Types.ObjectId.isValid(id));
+        if (invalidIds.length > 0) {
+          return res.status(400).json({ message: 'Invalid ObjectId(s) in article IDs.' });
+        }
+    
+        // Cập nhật trạng thái isRead của các bài viết
+        const result = await Article.updateMany(
+          { _id: { $in: articleIds } },
+          { $set: { isRead: true } }
+        );
+    
+        res.status(200).json({ message: 'Articles updated successfully.', result });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+      }
     }
 }
-
 module.exports = articleController;

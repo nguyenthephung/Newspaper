@@ -201,7 +201,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Tag, Modal } from 'antd';
 import axios from 'axios';
-import { getArticlePending, updateArticlePending } from "../../../redux/apiRequest";
+import { getArticle, updateArticlePending } from "../../../redux/apiRequest";
 import { useSelector, useDispatch } from 'react-redux';
 
 const ReviewArticles = () => {
@@ -211,27 +211,26 @@ const ReviewArticles = () => {
   const [currentArticle, setCurrentArticle] = useState(null);
   
   const users = useSelector((state) => state.user?.users?.allUsers) || [];
-  const articlesPending = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
-
+  const articles =  useSelector((state) => state.article?.getArticle?.articles);
+  const articlesPending = articles?.filter(article => 
+    article.status === 'reject' || article.status === 'pending'
+  );
   useEffect(() => {
     setLoading(true);
-    getArticlePending(dispatch);
+    getArticle(dispatch);
     setLoading(false);
   }, [dispatch]);
-  const sendApprovalNotification = (article) => {
-    users.forEach((user) => {
-      if (user.Subscribe) {
-        axios.post('/api/send-email', {
-          to: user.email,
-          subject: `Bài viết "${article.title}" đã được phê duyệt`,
-          body: `Xin chào ${user.username},\n\nBài viết "${article.title}" đã được phê duyệt và bạn có thể đọc nó trên trang web của chúng tôi.\n\nCảm ơn!`,
-        }).then((response) => {
-          console.log(`Email sent to ${user.email}`);
-        }).catch((error) => {
-          console.error(`Failed to send email to ${user.email}`, error);
-        });
-      }
-    });
+
+  const sendApprovalNotification = async (id) => {
+
+    try {
+      const response = await axios.post("/v1/sendEmail", {
+        articleId: id,
+      });
+     
+    } catch (error) {
+      console.error( error);
+    }
   };
 
   const handleApprove = (id) => {

@@ -2,47 +2,20 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./side.css";
 import "../Tpost/Tpost"
+import { useSelector } from "react-redux";
 import Heading from "../../../common/heading/Heading";
 import { Link } from "react-router-dom";
 import Tpost from "../Tpost/Tpost";
 
 const Side = () => {
-  const user = {
-    _id: "64e555fbf4a3a2b0b2d9f80c", // MongoDB ObjectId
-    username: "johndoe",
-    email: "johndoe@example.com",
-    password: "$2b$10$zZGxlKzXj9aV7e0vE9RDEO4VsaVtBX2m.Z/N.ZP5.8vflWk0.EGZe", // Mã hóa bcrypt
-    isAdmin: false,
-    socialAccounts: {
-      facebook: "https://facebook.com/johndoe",
-      google: "https://plus.google.com/johndoe",
-      phoneNumber: "+123456789"
-    },
-    preferences: {
-      categories: [
-        {
-          category: "64e555fbf4a3a2b0b2d9f812", // ObjectId của category
-          tags: ["news", "tech", "science"]
-        }
-      ]
-    },
-    Subscribe: true, // Người dùng đã đăng ký nhận tin tức
-    notificationsEnabled: true,
-    bookmarkedArticles: [
-      "64e555fbf4a3a2b0b2d9f823", // ObjectId của bài báo đã bookmark
-      "64e555fbf4a3a2b0b2d9f824"
-    ],
-    adFreeSubscription: false, // Người dùng không có gói ad-free
-    createdAt: "2024-08-23T07:45:27.929Z",
-    updatedAt: "2024-08-23T07:45:27.929Z"
-  };
+  const user = useSelector((state) => state.auth?.login?.currentUser);
   const [subscribed, setSubscribed] = useState(user.Subscribe);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/subscribe", {
+      const response = await axios.post("/v1/user/subscribe", {
         userId: user._id, // Sử dụng userId từ biến user
       });
 
