@@ -4,6 +4,7 @@ import Dashboard from "../../Pages/Dashboard";
 import Article from "../../Pages/Article";
 import ReviewArtic from "../../Pages/ReviewArtic";
 import Categoy from "../../Pages/Category"
+import ReviewWriterRequests from "../../Pages/ReviewWriterRequests/ReviewWriterRequests";
 function AppRoutes() {
   return (
     <Routes>
@@ -12,6 +13,7 @@ function AppRoutes() {
       <Route path="/admin/review" element={<ReviewArtic />}></Route>
       <Route path="/admin/user" element={<Users />}></Route>
       <Route path="/admin/category" element={<Categoy />}></Route>
+      <Route path="/admin/ReviewWriterRequests" element={<ReviewWriterRequests />}></Route>
     </Routes>
   );
 }

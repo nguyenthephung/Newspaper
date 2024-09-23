@@ -1,9 +1,23 @@
-import { Avatar, Badge, Drawer, List, Space, Typography, Form, Input, Button } from "antd";
+import {
+  Avatar,
+  Badge,
+  Drawer,
+  List,
+  Space,
+  Typography,
+  Form,
+  Input,
+  Button,
+} from "antd";
 import { BellFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { updateUser, getComment, getArticlePending } from "../../../redux/apiRequest";
+import {
+  updateUser,
+  getComment,
+  getArticlePending,
+} from "../../../redux/apiRequest";
 import "./header.css";
 
 function AdminHeader() {
@@ -12,13 +26,25 @@ function AdminHeader() {
   const [adminInfoVisible, setAdminInfoVisible] = useState(false);
   const dispatch = useDispatch();
 
-  const adminInfo = useSelector((state) => state.auth?.login?.currentUser);
-  const articlesPending = useSelector((state) => state.articlePending?.getArticlePending?.articlesPending) || [];
-  const comments = useSelector((state) => state.comment?.getComment?.comments) || [];
-  
+  const adminInfo = useSelector(
+    (state) => state.auth?.login?.currentUser
+  );
+  const articlesPending = useSelector(
+    (state) =>
+      state.articlePending?.getArticlePending?.articlesPending
+  ) || [];
+  const comments = useSelector(
+    (state) => state.comment?.getComment?.comments
+  ) || [];
+
   // Lọc những comment và bài viết chưa được đọc
   const unreadComments = comments.filter((comment) => !comment.isRead);
-  const pendingArticles = articlesPending.filter((article) => article.status === 'pending' && article.publish === true&&article.isRead ===false);
+  const pendingArticles = articlesPending.filter(
+    (article) =>
+      article.status === "pending" &&
+      article.publish === true &&
+      article.isRead === false
+  );
 
   useEffect(() => {
     getComment(dispatch);
@@ -43,12 +69,15 @@ function AdminHeader() {
     closeAdminInfoDrawer();
   };
 
-  // Gọi API để đánh dấu tất cả bình luận là đã đọc
-  const markCommentsAsRead = async (comments) => {
+  const markCommentsAsRead = async (commentsToMark) => {
     try {
-      const commentIds = comments.map(comment => comment._id);
-      if (commentIds.length > 0) {
-        await axios.post("/v1/comment/markAsRead", { commentIds });
+      const unreadCommentIds = commentsToMark
+        .filter((comment) => !comment.isRead)
+        .map((comment) => comment._id);
+      if (unreadCommentIds.length > 0) {
+        await axios.post("/v1/comment/markAsRead", {
+          commentIds: unreadCommentIds,
+        });
         // Sau khi thành công, làm mới danh sách bình luận
         await getComment(dispatch);
       }
@@ -57,12 +86,15 @@ function AdminHeader() {
     }
   };
 
-  // Gọi API để đánh dấu tất cả bài viết là đã đọc
-  const markArticlesAsRead = async (articles) => {
+  const markArticlesAsRead = async (articlesToMark) => {
     try {
-      const articleIds = articles.map(article => article._id);
-      if (articleIds.length > 0) {
-        await axios.post("/v1/article/markAsRead", { articleIds });
+      const unreadArticleIds = articlesToMark
+        .filter((article) => !article.isRead)
+        .map((article) => article._id);
+      if (unreadArticleIds.length > 0) {
+        await axios.post("/v1/article/markAsRead", {
+          articleIds: unreadArticleIds,
+        });
         // Sau khi thành công, làm mới danh sách bài viết
         await getArticlePending(dispatch);
       }
@@ -75,22 +107,20 @@ function AdminHeader() {
     setCommentsOpen(true);
     // Đánh dấu tất cả bình luận là đã đọc
     await markCommentsAsRead(unreadComments);
-    // Làm mới dữ liệu sau khi API gọi thành công
-    const updatedComments = await getComment(dispatch);
-    // Kiểm tra xem có cập nhật đúng cách không
-    console.log("Updated Comments: ", updatedComments);
   };
-  
-  const openNotificationsDrawer = async () => {
+
+  const openNotificationsDrawer = () => {
     setNotificationsOpen(true);
-    // Đánh dấu tất cả thông báo là đã đọc
-    await markArticlesAsRead(pendingArticles);
-    // Làm mới dữ liệu sau khi API gọi thành công
-    const updatedArticles = await getArticlePending(dispatch);
-    // Kiểm tra xem có cập nhật đúng cách không
-    console.log("Updated Articles: ", updatedArticles);
+    // Không đánh dấu bài viết là đã đọc tại đây
   };
-  
+
+  const handleArticleClick = async (article) => {
+    // Xử lý khi người dùng nhấp vào bài viết (ví dụ: mở chi tiết bài viết)
+    // Bạn có thể thêm logic để mở chi tiết bài viết ở đây
+
+    // Đánh dấu bài viết này là đã đọc
+    await markArticlesAsRead([article]);
+  };
 
   return (
     <div className="AppHeader">
@@ -105,19 +135,27 @@ function AdminHeader() {
         Admin Dashboard
       </Typography.Title>
       <Space>
-        <Badge count={unreadComments.length} dot>
+        <Badge
+          count={unreadComments.length}
+          dot={unreadComments.some((comment) => !comment.isRead)}
+        >
           <MailOutlined
             style={{ fontSize: 24 }}
             onClick={openCommentsDrawer}
           />
         </Badge>
-        <Badge count={pendingArticles.length}>
+
+        <Badge
+          count={pendingArticles.length}
+          dot={pendingArticles.some((article) => !article.isRead)}
+        >
           <BellFilled
             style={{ fontSize: 24 }}
             onClick={openNotificationsDrawer}
           />
         </Badge>
       </Space>
+      {/* Drawer Cho Bình Luận */}
       <Drawer
         title="Comments"
         visible={commentsOpen}
@@ -128,11 +166,21 @@ function AdminHeader() {
           dataSource={comments}
           renderItem={(item) => (
             <List.Item>
-              <Typography.Text strong>{item.user}</Typography.Text>: {item.content}
+              <Typography.Text strong>
+                {item.user?.name || "Unknown User"}{" "}
+                {item.userId ? `(${item.userId})` : "(Unknown ID)"}
+              </Typography.Text>{" "}
+              commented on the article{" "}
+              <Typography.Text strong>
+                {item.article?.title || (item.articleId ? item.articleId : "Unknown Article")}
+              </Typography.Text>{" "}
+              with the content:{" "}
+              {item.content || "No content provided"}
             </List.Item>
           )}
         />
       </Drawer>
+      {/* Drawer Cho Thông Báo Bài Viết */}
       <Drawer
         title="Notifications"
         visible={notificationsOpen}
@@ -142,12 +190,16 @@ function AdminHeader() {
         <List
           dataSource={pendingArticles}
           renderItem={(item) => (
-            <List.Item>
+            <List.Item
+              onClick={() => handleArticleClick(item)}
+              style={{ cursor: "pointer" }}
+            >
               <Typography.Text strong>{item.author}</Typography.Text>: {item.title} is pending review!
             </List.Item>
           )}
         />
       </Drawer>
+      {/* Drawer Cho Thông Tin Admin */}
       <Drawer
         title="Admin Information"
         visible={adminInfoVisible}

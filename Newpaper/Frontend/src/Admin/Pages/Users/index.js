@@ -203,27 +203,30 @@
 // };
 
 // export default Users;
-import { Button, Checkbox, Form, Input, Modal, Space, Table, Typography, message } from "antd";
+import { Button, Form, Input, Modal, Select, Space, Table, Typography, message } from "antd";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, updateUser, deleteUser } from "../../../redux/apiRequest";
 import debounce from 'lodash/debounce';
 import { useNavigate } from "react-router-dom";
+
 const Users = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const navigate = useNavigate();
-  const users = useSelector((state) => state.user?.users?.allUsers) || []; 
+  const users = useSelector((state) => state.user?.users?.allUsers) || [];
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [form] = Form.useForm();
+
   useEffect(() => {
     if (!user) {
       navigate("/"); // Redirect to home page if user doesn't exist
     }
   }, [user, navigate]);
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -241,7 +244,7 @@ const Users = () => {
 
   const filteredUsers = useMemo(() => {
     if (!searchTerm) return users;
-    return users.filter((user) => 
+    return users.filter((user) =>
       user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.socialAccounts?.phoneNumber?.includes(searchTerm)
@@ -278,49 +281,47 @@ const Users = () => {
 
   const handleSaveUser = async () => {
     try {
-        const values = await form.validateFields();
-        setLoading(true);
+      const values = await form.validateFields();
+      setLoading(true);
 
-        const userData = {
-            username: values.username,
-            email: values.email,
-            isAdmin: values.isAdmin || false,
-            socialAccounts: {
-                phoneNumber: values.phoneNumber || '',
-            },
-        };
+      const userData = {
+        username: values.username,
+        email: values.email,
+        role: values.role, // Sử dụng role thay vì isAdmin
+        socialAccounts: {
+          phoneNumber: values.phoneNumber || '',
+        },
+      };
 
-        if (values.password) {
-            userData.password = values.password;
+      if (values.password) {
+        userData.password = values.password;
+      }
+
+      if (editingUser) {
+        // Sửa người dùng hiện có
+        const updatedUser = { ...userData, _id: editingUser._id };
+        await updateUser(dispatch, updatedUser);
+        message.success("User updated successfully");
+      } else {
+        // Thêm người dùng mới
+        if (!values.password) {
+          message.error("Password is required for new users");
+          setLoading(false);
+          return;
         }
+        await updateUser(dispatch, userData); // Không thêm _id khi thêm người dùng mới
+        message.success("User created successfully");
+      }
 
-        if (editingUser) {
-            // Sửa người dùng hiện có
-            const updatedUser = { ...userData, _id: editingUser._id };
-            await updateUser(dispatch, updatedUser);
-            message.success("User updated successfully");
-        } else {
-            // Thêm người dùng mới
-            if (!values.password) {
-                message.error("Password is required for new users");
-                setLoading(false);
-                return;
-            }
-            await updateUser(dispatch, userData); // Không thêm _id khi thêm người dùng mới
-            message.success("User created successfully");
-        }
-
-        await getAllUsers(dispatch);
-        setModalVisible(false);
-        form.resetFields();
+      await getAllUsers(dispatch);
+      setModalVisible(false);
+      form.resetFields();
     } catch (error) {
-        message.error("Operation failed: " + error.message);
+      message.error("Operation failed: " + error.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
-  
+  };
 
   const handleSearch = debounce((value) => {
     setSearchTerm(value);
@@ -338,9 +339,9 @@ const Users = () => {
       render: (email) => email || 'No Email',
     },
     {
-      title: "Is Admin",
-      dataIndex: "isAdmin",
-      render: (isAdmin) => <Checkbox checked={isAdmin || false} disabled />,
+      title: "Role", // Sửa title thành Role
+      dataIndex: "role", // Sử dụng dataIndex là role
+      render: (role) => role || 'No Role',
     },
     {
       title: "Phone Number",
@@ -422,11 +423,15 @@ const Users = () => {
             <Input.Password placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"} />
           </Form.Item>
           <Form.Item
-            name="isAdmin"
-            valuePropName="checked"
-            initialValue={false}
+            name="role"
+            label="Role"
+            rules={[{ required: true, message: "Please select a role" }]}
           >
-            <Checkbox>Is Admin</Checkbox>
+            <Select>
+              <Select.Option value="guest">Guest</Select.Option>
+              <Select.Option value="writer">Writer</Select.Option>
+              <Select.Option value="admin">Admin</Select.Option>
+            </Select>
           </Form.Item>
           <Form.Item
             name="phoneNumber"

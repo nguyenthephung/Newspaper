@@ -202,7 +202,7 @@ const ArticleForm = () => {
         const article = {
             userId: user._id,
             title,
-            author,
+            author:user.username,
             category,
             status: "pending",
             tags: selectedTags,
@@ -211,14 +211,7 @@ const ArticleForm = () => {
         };
         updateArticle(dispatch, article);
 
-        // Hiển thị thông báo khi lưu thành công
-        notification.success({
-            message: 'Success',
-            description: isPublished ? 'Article published successfully!' : 'Draft saved successfully!',
-        });
-
-        // Chuyển hướng sau khi lưu
-        navigate('/writer');
+   
     };
 
     const handleSaveDraft = () => {
@@ -245,13 +238,7 @@ const ArticleForm = () => {
                 placeholder="Article Title"
                 className="input-title"
             />
-            <input
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="Author"
-                className="input-author"
-            />
+        
             <select value={category} onChange={handleCategoryChange} className="input-category">
                 <option value="">Select Category</option>
                 {categories.map((cat) => (

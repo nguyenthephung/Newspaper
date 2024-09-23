@@ -56,11 +56,9 @@ const articleController = {
     update: async (req, res) => {
       try {
         const { _id, category: categoryName, tags: tagNames, userId, ...articleData } = req.body;
-        console.log(req.body);
           articleData.category = categoryName;
         
         articleData.tags = tagNames;
-  
         let article;
         if (_id) {
           // Nếu có ID trong request body, tìm và cập nhật article
@@ -88,6 +86,7 @@ const articleController = {
               await user.save();
             }
           } else {
+
             return res.status(404).json({ error: 'User not found' });
           }
         }
@@ -118,7 +117,6 @@ const articleController = {
     
         res.json({ message: 'Article deleted and removed from all user bookmarks' });
       } catch (err) {
-        console.error(err);
         res.status(500).json({ error: err.message });
       }
     },
@@ -163,7 +161,6 @@ const articleController = {
     
         res.status(200).json({ message: 'Articles updated successfully.', result });
       } catch (error) {
-        console.error(error);
         res.status(500).json({ message: error.message });
       }
     }

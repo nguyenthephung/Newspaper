@@ -9,6 +9,7 @@ import Dashboard from "./Admin/Pages/Dashboard";
 import Users from "./Admin/Pages/Users";
 import ReviewArticles from "./Admin/Pages/ReviewArtic";
 import Tag from "./Admin/Pages/Tags/index"
+import ReviewWriterRequests from "./Admin/Pages/ReviewWriterRequests/ReviewWriterRequests";
 import { useState } from "react";
 import Header from "./Customer/common/header/Header"
 import Homepages from "./Customer/home/Homepages"
@@ -24,6 +25,7 @@ import Searchpage from "./Customer/Searchpages/Searchpage";
 import Publish from "./Writter/Component/Publishpage/Publish";
 import Draft from "./Writter/Component/Draftpage/Draft";
 import TestPage from "./Writter/testPage"
+import WritePostPage from "./Writter/Component/Quillpage/WritePostPage"
 function App() {
   return (
     <div className="App">
@@ -103,6 +105,18 @@ function App() {
           <AdminFooter />
         </div>
       } />
+            <Route path="/admin/ReviewWriterRequests" element={
+        <div>
+          <AdminHeader />
+          <div className="SideMenuAndPageContent">
+            <SideMenu />
+            <div className="PageContent">
+              <ReviewWriterRequests />
+            </div>
+          </div>
+          <AdminFooter />
+        </div>
+      } />
        <Route path="/" element={
         <div>
           <Header />
@@ -132,16 +146,11 @@ function App() {
           <Footer />
         </div>
       } />
-        <Route path="/writer" element={
+        <Route path="/personalPager" element={
         <div>
-          <div className="writter" >
-          <div className="sidebar">
-                <UserInfo/>
-            </div>
-            <div className="main-content">
-                <Writter />
-            </div>
-            </div>
+           <Header />
+          <UserInfo/>
+          <Footer />
         </div>
       } />
        <Route path="/search" element={
@@ -169,6 +178,13 @@ function App() {
         <div>
         
          <TestPage/>
+
+        </div>
+      } />
+       <Route path="/writer" element={
+        <div>
+        
+         <WritePostPage/>
 
         </div>
       } />

@@ -6,6 +6,8 @@ const categoryController = require('../controllers/Category_controller');
 const commentController = require('../controllers/Comment_controller');
 const tagController = require('../controllers/Tag_controller')
 const ratingController = require('../controllers/Rating_controller')
+const requestForm = require('../controllers/requestForm_controller');
+const { getAllRequests, createRequest, updateRequestStatus, deleteRequest } = require('../controllers/requestForm_controller');  // Import controller
 const { verifyToken,  verifyTokenAndUserAuthorization, verifyTokenAndAdmin,} = require("../middleware/userVerifyToken");
 //Auth
 router.post('/auth/register', userController.register);
@@ -54,3 +56,9 @@ router.post('/sendEmail',userController.publishArticle);
 router.post('/comment/markAsRead',commentController.markCommentsAsRead)
 router.post('/article/markAsRead',articleController.markArticlesAsRead)
 module.exports = router;
+
+//Request Form
+router.get('/requests', requestForm.getAllRequests);
+router.post('/request', requestForm.createRequest);
+router.put('/requests/:requestId', requestForm.updateRequestStatus);
+router.get('/requests/:userId', requestForm.getRequestById);

@@ -1,45 +1,44 @@
 
-// import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
 // import { Link, useNavigate } from "react-router-dom";
 // import Heading from "../../../Customer/common/heading/Heading";
+// import { useDispatch, useSelector } from "react-redux";
+// import { deleteArticle, getBookMaked, getArticlePending } from "../../../redux/apiRequest";
 // import "./publish.css";
 
-// // Dữ liệu mẫu
-// const popular = [
-//   {
-//     _id: "sampleId123",
-//     title: "Sample Article Title 1",
-//     content_blocks: [
-//       { type: "paragraph", content: "This is a sample paragraph." },
-//       { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-//       { type: "quote", content: "This is a sample quote." }
-//     ],
-//     author: "Sample Author 1",
-//     category: { name: "fun" },
-//     totalRating: 10,
-//     ratingCount: 5,
-//     views: 150,
-//     createdAt: "2024-08-17T00:00:00Z"
-//   },
-//   // Thêm các bài viết khác nếu cần
-// ];
-
 // const Publish = () => {
-//   const [articles, setArticles] = useState(popular || []);
-//   const navigate = useNavigate();
+//   const articles = useSelector((state) => state.bookMaked?.getBookMaked?.bookMaked) || [];
+//   const user = useSelector((state) => state.auth?.login?.currentUser);
+//   const dispatch = useDispatch(); 
 
+//   useEffect(() => {
+//     if (user) {
+//       getBookMaked(dispatch, user._id);
+//     }
+//   }, [dispatch, user]);
+
+//   useEffect(() => {
+//     getArticlePending(dispatch);
+//   }, [dispatch]);
+
+//   // Sửa hàm handleDelete
 //   const handleDelete = (id) => {
-//     setArticles(articles.filter(article => article._id !== id));
-//     console.log(`Article with id ${id} deleted`);
+//     deleteArticle(dispatch, id).then(() => {
+//       // getBookMaked lại để cập nhật danh sách sau khi xóa
+//       getBookMaked(dispatch, user._id);
+//     });
 //   };
+
+//   // Lọc các bài viết đã xuất bản
+//   const publishedArticles = articles.filter(article => article.publish === true);
 
 //   return (
 //     <>
 //       <section className='music'>
 //         <Heading title='Báo công khai của bạn' />
 //         <div className='content'>
-//           {articles.length > 0 ? (
-//             articles.map((val) => (
+//           {publishedArticles.length > 0 ? (
+//             publishedArticles.map((val) => (
 //               <div className='items' key={val._id}>
 //                 <div className='box shadow flexSB'>
 //                   <div className='images'>
@@ -56,7 +55,7 @@
 //                   </div>
 //                   <div className='text'>
 //                     <h1 className='title'>
-//                       <Link to={`/SinglePage/${val._id}`}>{val.title.slice(0, 40)}...</Link>
+//                       <Link to={`/testpage/${val._id}`}>{val.title.slice(0, 40)}...</Link>
 //                     </h1>
 //                     <div className='date'>
 //                       <i className='fas fa-calendar-days'></i>
@@ -69,6 +68,14 @@
 //                       <i className='fas fa-comments'></i>
 //                       <label>{val.ratingCount}</label>
 //                     </div>
+//                     <div className="status">
+//                       <label><strong>Trạng thái:</strong> </label>
+//                       <span className={`status-label ${val.status}`}>
+//                         {val.status === 'pending' && 'Pending Review'}
+//                         {val.status === 'approved' && 'Approved'}
+//                         {val.status === 'rejected' && 'Rejected'}
+//                       </span>
+//                     </div>
 //                     <button onClick={() => handleDelete(val._id)} className='delete-button'>
 //                       Xóa
 //                     </button>
@@ -77,7 +84,7 @@
 //               </div>
 //             ))
 //           ) : (
-//             <p>No drafts available</p>
+//             <p>No published articles available</p>
 //           )}
 //         </div>
 //       </section>
@@ -86,41 +93,48 @@
 // };
 
 // export default Publish;
-
-import React, { useState ,useEffect} from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
-import { useDispatch,useSelector } from "react-redux";
-import { deleteArticle ,getBookMaked,getArticlePending} from "../../../redux/apiRequest";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteArticle, getBookMaked, getArticlePending } from "../../../redux/apiRequest";
 import "./publish.css";
-
-
 
 const Publish = () => {
   const articles = useSelector((state) => state.bookMaked?.getBookMaked?.bookMaked) || [];
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const dispatch = useDispatch(); 
+
   useEffect(() => {
     if (user) {
       getBookMaked(dispatch, user._id);
     }
   }, [dispatch, user]);
 
-useEffect(() => {
-  getArticlePending(dispatch);
-}, [dispatch]);
-  // Sửa hàm handleDelete
-const handleDelete = (id) => {
-  deleteArticle(dispatch, id).then(() => {
-    // getBookMaked lại để cập nhật danh sách sau khi xóa
-    getBookMaked(dispatch, user._id);
-  });
-};
+  useEffect(() => {
+    getArticlePending(dispatch);
+  }, [dispatch]);
 
-  // Lọc các bài viết đã xuất bản
-  const publishedArticles = articles.filter(article =>
-    article.publish === true );
+  const handleDelete = (id) => {
+    deleteArticle(dispatch, id).then(() => {
+      getBookMaked(dispatch, user._id);
+    });
+  };
 
+  const publishedArticles = articles.filter(article => article.publish === true);
+
+  const extractFirstImage = (content) => {
+    const imgTag = content.match(/<img[^>]+src="([^">]+)"/);
+    if (imgTag) {
+      return imgTag[1].replace(/&amp;/g, '&'); // Thay thế &amp; thành &
+    }
+    return null;
+  };
+  
+  const extractTextContent = (htmlContent) => {
+    const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+    return doc.body.textContent || "";
+  };
 
   return (
     <>
@@ -132,15 +146,13 @@ const handleDelete = (id) => {
               <div className='items' key={val._id}>
                 <div className='box shadow flexSB'>
                   <div className='images'>
-                    {val.content_blocks
-                      .filter(block => block.type === 'image')
-                      .map((block, index) => (
-                        <div className='img' key={index}>
-                          <img src={block.src} alt={block.alt} />
-                        </div>
-                      ))}
+                    {val.content && (
+                      <div className='img'>
+                        <img src={extractFirstImage(val.content)} alt="Article" />
+                      </div>
+                    )}
                     <div className='category category1'>
-                      <span>{val.category.name}</span>
+                      <span>{val.category}</span>
                     </div>
                   </div>
                   <div className='text'>
@@ -151,12 +163,22 @@ const handleDelete = (id) => {
                       <i className='fas fa-calendar-days'></i>
                       <label>{new Date(val.createdAt).toLocaleDateString()}</label>
                     </div>
-                    <p className='desc'>{val.content_blocks.find(block => block.type === 'paragraph')?.content.slice(0, 250)}...</p>
+                    <p className='desc'>
+                      {val.content ? extractTextContent(val.content).slice(0, 250) : ''}...
+                    </p>
                     <div className='comment'>
                       <i className='fas fa-share'></i>
                       <label>Share / </label>
                       <i className='fas fa-comments'></i>
                       <label>{val.ratingCount}</label>
+                    </div>
+                    <div className="status">
+                      <label><strong>Trạng thái:</strong> </label>
+                      <span className={`status-label ${val.status}`}>
+                        {val.status === 'pending' && 'Pending Review'}
+                        {val.status === 'approved' && 'Approved'}
+                        {val.status === 'rejected' && 'Rejected'}
+                      </span>
                     </div>
                     <button onClick={() => handleDelete(val._id)} className='delete-button'>
                       Xóa
@@ -175,4 +197,3 @@ const handleDelete = (id) => {
 };
 
 export default Publish;
-

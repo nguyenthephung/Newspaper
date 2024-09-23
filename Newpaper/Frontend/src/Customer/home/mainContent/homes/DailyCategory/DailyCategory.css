@@ -1,34 +1,34 @@
 .dailyCategory .box {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Căn giữa nội dung */
-  }
-  
-  .dailyCategory .images {
-    width: 70%; /* Giảm kích thước của container ảnh */
-    height: auto;
-    margin-bottom: 15px; /* Khoảng cách dưới ảnh */
-  }
-  
-  .dailyCategory .img img {
-    width: 50%; /* Đảm bảo ảnh không vượt quá container */
-    height: auto;
-    object-fit: cover; /* Duy trì tỷ lệ ảnh */
-    border-radius: 8px; /* Bo tròn các góc của ảnh nếu muốn */
-  }
-  
-  .dailyCategory .text {
-    padding: 10px 20px; /* Điều chỉnh padding để nội dung gần ảnh hơn */
-    text-align: center; /* Căn giữa văn bản */
-  }
-  
-  .dailyCategory .title {
-    font-size: 18px;
-    margin: 10px 0;
-  }
-  
-  .dailyCategory .date {
-    font-size: 14px;
-    color: gray;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa nội dung */
+  margin: 20px 0; /* Thêm khoảng cách giữa các box */
+}
+
+.dailyCategory .images {
+  width: 100%; /* Đặt kích thước container ảnh bằng 100% */
+  max-width: 400px; /* Đặt chiều rộng tối đa cho container ảnh */
+  margin: 0 auto 15px; /* Căn giữa container ảnh và thêm khoảng cách dưới ảnh */
+}
+
+.dailyCategory .img img {
+  width: 100%; /* Đảm bảo ảnh chiếm 100% chiều rộng của container */
+  height: auto;
+  object-fit: cover; /* Duy trì tỷ lệ ảnh */
+  border-radius: 8px; /* Bo tròn các góc của ảnh */
+}
+
+.dailyCategory .text {
+  padding: 15px 20px; /* Tăng padding để nội dung gần ảnh hơn */
+  text-align: center; /* Căn giữa văn bản */
+}
+
+.dailyCategory .title {
+  font-size: 20px; /* Tăng kích thước chữ tiêu đề */
+  margin: 10px 0;
+}
+
+.dailyCategory .date {
+  font-size: 16px; /* Tăng kích thước chữ ngày */
+  color: gray;
+}

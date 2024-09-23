@@ -97,11 +97,11 @@
 // export default Draft;
 // Draft.js
 
-import React, { useState ,useEffect} from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Heading from "../../../Customer/common/heading/Heading";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteArticle ,getBookMaked,getArticlePending} from "../../../redux/apiRequest";
+import { deleteArticle, getBookMaked, getArticlePending } from "../../../redux/apiRequest";
 import "./draft.css";
 
 const Draft = () => {
@@ -109,50 +109,59 @@ const Draft = () => {
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const navigate = useNavigate();
   const dispatch = useDispatch(); 
+
   useEffect(() => {
     if (user) {
       getBookMaked(dispatch, user._id);
     }
   }, [dispatch, user]);
-useEffect(() => {
-  getArticlePending(dispatch);
-}, [dispatch]);
-  // Sửa hàm handleDelete
-const handleDelete = (id) => {
-  deleteArticle(dispatch, id).then(() => {
-    // getBookMaked lại để cập nhật danh sách sau khi xóa
-    getBookMaked(dispatch, user._id);
-  });
-};
 
+  useEffect(() => {
+    getArticlePending(dispatch);
+  }, [dispatch]);
 
-  const handleEdit = (article) => {
-    navigate('/writer', { state: { article } });
+  const handleDelete = (id) => {
+    deleteArticle(dispatch, id).then(() => {
+      getBookMaked(dispatch, user._id);
+    });
   };
 
-  // Lọc các bài viết chưa được xuất bản và nằm trong danh sách bookmarkedArticles của user
-  const unpublishedBookmarkedArticles = articles.filter(article =>
-    article.publish === false );
+  const handleEdit = (article) => {
+    navigate('/writer', { state: { article } }); // Đảm bảo đường dẫn '/writer' là đúng
+  };
+
+  const unpublishedArticles = articles.filter(article => article.publish === false);
+
+  const extractFirstImage = (content) => {
+    const imgTag = content.match(/<img[^>]+src="([^">]+)"/);
+    if (imgTag) {
+      return imgTag[1].replace(/&amp;/g, '&'); // Thay thế &amp; thành &
+    }
+    return null;
+  };
+  
+  const extractTextContent = (htmlContent) => {
+    const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+    return doc.body.textContent || "";
+  };
 
   return (
     <>
       <section className='music'>
         <Heading title='Báo nháp của bạn' />
         <div className='content'>
-          {unpublishedBookmarkedArticles.length > 0 ? (
-            unpublishedBookmarkedArticles.map((val) => (
+          {unpublishedArticles.length > 0 ? (
+            unpublishedArticles.map((val) => (
               <div className='items' key={val._id}>
                 <div className='box shadow flexSB'>
                   <div className='images'>
-                    {val.content_blocks
-                      .filter(block => block.type === 'image')
-                      .map((block, index) => (
-                        <div className='img' key={index}>
-                          <img src={block.src} alt={block.alt} />
-                        </div>
-                      ))}
+                    {val.content && (
+                      <div className='img'>
+                        <img src={extractFirstImage(val.content)} alt="Draft Article" />
+                      </div>
+                    )}
                     <div className='category category1'>
-                      <span>{val.category.name}</span>
+                      <span>{val.category}</span>
                     </div>
                   </div>
                   <div className='text'>
@@ -163,7 +172,9 @@ const handleDelete = (id) => {
                       <i className='fas fa-calendar-days'></i>
                       <label>{new Date(val.createdAt).toLocaleDateString()}</label>
                     </div>
-                    <p className='desc'>{val.content_blocks.find(block => block.type === 'paragraph')?.content.slice(0, 250)}...</p>
+                    <p className='desc'>
+                      {val.content ? extractTextContent(val.content).slice(0, 250) : ''}...
+                    </p>
                     <div className='comment'>
                       <i className='fas fa-share'></i>
                       <label>Share / </label>

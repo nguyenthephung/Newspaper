@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Input, Space, Typography, Select, Rate } from 'antd';
-const { Option } = Select;
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, Table, Modal, Form, Input, Space, Typography, Select, Rate, notification } from 'antd';
+import { Editor } from '@tinymce/tinymce-react';
 import { useDispatch, useSelector } from "react-redux";
 import { getArticle, updateArticle, deleteArticle, getCategories } from '../../../redux/apiRequest';
 import { useNavigate } from "react-router-dom";
+
+const { Option } = Select;
+const { Title } = Typography;
+
 const Article = () => {
   const user = useSelector((state) => state.auth?.login?.currentUser);
   const navigate = useNavigate();
   const articles = useSelector((state) => state.article?.getArticle?.articles);
   const categories = useSelector((state) => state.category?.getCategory?.categories);
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (!user) {
-      navigate("/"); // Redirect to home page if user doesn't exist
-    }
-  }, [user, navigate]);
-  useEffect(() => {
-    getArticle(dispatch);
-    getCategories(dispatch);
-  }, [dispatch]);
 
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
@@ -26,12 +21,23 @@ const Article = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [contentBlocks, setContentBlocks] = useState([]);
   const [form] = Form.useForm();
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/"); // Redirect to home page if user doesn't exist
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    getArticle(dispatch);
+    getCategories(dispatch);
+  }, [dispatch]);
 
   useEffect(() => {
     setLoading(true);
-    if(articles){
+    if (articles) {
       setTimeout(() => {
         setDataSource(articles);
         setFilteredData(articles);
@@ -44,55 +50,132 @@ const Article = () => {
     if (!categories || !Array.isArray(categories)) return [];
     return categories.map(category => category.name);
   };
-  
+
   const getTags = (categoryName) => {
     if (!categories || !Array.isArray(categories)) return [];
     const category = categories.find(cat => cat.name === categoryName);
     return category ? category.tags : [];
   };
-  
 
   const handleAdd = () => {
     form.validateFields().then(values => {
+      const htmlContent = editorRef.current ? editorRef.current.getContent() : '';
+      if (!htmlContent) {
+        notification.error({
+          message: 'Error',
+          description: 'Content cannot be empty!',
+        });
+        return;
+      }
+
       const newArticle = {
         ...values,
-        content_blocks: contentBlocks,
+        content: htmlContent,
         status: 'approved',
         views: 0,
         totalRating: 0,
         ratingCount: 0,
+        userId: user._id,
       };
-      console.log(newArticle);
-      updateArticle(dispatch, newArticle);
-      setIsModalVisible(false);
+
+      updateArticle(dispatch, newArticle)
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Article added successfully!',
+          });
+          getArticle(dispatch);
+          setIsModalVisible(false);
+          form.resetFields();
+          if (editorRef.current) {
+            editorRef.current.setContent('');
+          }
+        })
+        .catch((error) => {
+          notification.error({
+            message: 'Error',
+            description: 'An error occurred while adding the article.',
+          });
+        });
+    }).catch((info) => {
+      console.log('Validate Failed:', info);
     });
   };
 
   const handleEdit = (record) => {
     setEditingArticle(record);
-    form.setFieldsValue(record);
-    setContentBlocks(record.content_blocks || []);
+    form.setFieldsValue({
+      title: record.title,
+      author: record.author,
+      category: record.category,
+      tags: record.tags,
+      // content sẽ được set trong useEffect
+    });
     setSelectedCategory(record.category);
     setIsModalVisible(true);
   };
 
   const handleSaveEdit = () => {
     form.validateFields().then(values => {
+      const htmlContent = editorRef.current ? editorRef.current.getContent() : '';
+      if (!htmlContent) {
+        notification.error({
+          message: 'Error',
+          description: 'Content cannot be empty!',
+        });
+        return;
+      }
+
       const updatedArticle = {
         ...editingArticle,
         ...values,
-        content_blocks: contentBlocks,
+        content: htmlContent,
       };
-      updateArticle(dispatch, updatedArticle);
-      setIsModalVisible(false);
+
+      updateArticle(dispatch, updatedArticle)
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Article updated successfully!',
+          });
+          getArticle(dispatch);
+          setIsModalVisible(false);
+          form.resetFields();
+          setEditingArticle(null);
+        })
+        .catch((error) => {
+          notification.error({
+            message: 'Error',
+            description: 'An error occurred while updating the article.',
+          });
+        });
+    }).catch((info) => {
+      console.log('Validate Failed:', info);
     });
   };
 
   const handleDelete = (record) => {
-    deleteArticle(dispatch, record._id);
-    const newData = dataSource.filter((article) => article._id !== record._id);
-    setDataSource(newData);
-    setFilteredData(newData);
+    Modal.confirm({
+      title: 'Are you sure you want to delete this article?',
+      onOk: () => {
+        deleteArticle(dispatch, record._id)
+          .then(() => {
+            notification.success({
+              message: 'Deleted',
+              description: 'Article deleted successfully!',
+            });
+            const newData = dataSource.filter((article) => article._id !== record._id);
+            setDataSource(newData);
+            setFilteredData(newData);
+          })
+          .catch((error) => {
+            notification.error({
+              message: 'Error',
+              description: 'An error occurred while deleting the article.',
+            });
+          });
+      },
+    });
   };
 
   const handleCategoryChange = (category) => {
@@ -100,25 +183,20 @@ const Article = () => {
     form.setFieldsValue({ tags: [] });
   };
 
-  const addContentBlock = () => {
-    setContentBlocks([...contentBlocks, { type: 'paragraph', content: '' }]);
-  };
-
-  const handleBlockChange = (index, field, value) => {
-    const newBlocks = [...contentBlocks];
-    newBlocks[index][field] = value;
-    setContentBlocks(newBlocks);
-  };
-
-  const removeContentBlock = (index) => {
-    setContentBlocks(contentBlocks.filter((_, i) => i !== index));
-  };
+  // Khi mở modal để chỉnh sửa, nạp nội dung vào TinyMCE
+  useEffect(() => {
+    if (editingArticle && editorRef.current) {
+      editorRef.current.setContent(editingArticle.content || '');
+    } else if (!editingArticle && editorRef.current) {
+      editorRef.current.setContent('');
+    }
+  }, [editingArticle]);
 
   return (
-    <Space direction="vertical" size={20}>
-      <Typography.Title level={4}>Article Management</Typography.Title>
-      <Space direction="horizontal">
-        <Button type="primary" onClick={() => setIsModalVisible(true)}>Add Article</Button>
+    <Space direction="vertical" size={20} style={{ width: '100%' }}>
+      <Title level={4}>Article Management</Title>
+      <Space direction="horizontal" style={{ justifyContent: 'space-between', width: '100%' }}>
+        <Button type="primary" onClick={() => { setIsModalVisible(true); setEditingArticle(null); form.resetFields(); if (editorRef.current) { editorRef.current.setContent(''); } }}>Add Article</Button>
         <Input.Search
           placeholder="Search articles"
           enterButton
@@ -126,6 +204,7 @@ const Article = () => {
             article.title.toLowerCase().includes(value.toLowerCase()) ||
             article.author.toLowerCase().includes(value.toLowerCase())
           ))}
+          style={{ maxWidth: '300px' }}
         />
       </Space>
       <Table
@@ -136,32 +215,41 @@ const Article = () => {
           {
             title: "Title",
             dataIndex: "title",
+            sorter: (a, b) => a.title.localeCompare(b.title),
           },
           {
             title: "Author",
             dataIndex: "author",
+            sorter: (a, b) => a.author.localeCompare(b.author),
           },
           {
             title: "Category",
             dataIndex: "category",
             render: (category) => <span>{category || "Unknown"}</span>,
+            filters: getCategoryNames().map(cat => ({ text: cat, value: cat })),
+            onFilter: (value, record) => record.category === value,
           },
           {
             title: "Tags",
             dataIndex: "tags",
             render: (tags) => (
-              <ul>
-               {(tags || []).map((tag, index) => ( // Đảm bảo tags luôn là một mảng
-            <li key={index}>{tag}</li>
-          ))}
+              <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                {(tags || []).map((tag, index) => (
+                  <li key={index}>{tag}</li>
+                ))}
               </ul>
             ),
           },
           {
             title: "Average Rating",
             render: (record) => {
-              const averageRating = record.ratingCount === 0 ? 0 : record.totalRating / record.ratingCount;
-              return <Rate value={averageRating} allowHalf disabled />;
+              const averageRating = record.ratingCount === 0 ? 0 : (record.totalRating / record.ratingCount).toFixed(1);
+              return <Rate value={parseFloat(averageRating)} allowHalf disabled />;
+            },
+            sorter: (a, b) => {
+              const avgA = a.ratingCount === 0 ? 0 : a.totalRating / a.ratingCount;
+              const avgB = b.ratingCount === 0 ? 0 : b.totalRating / b.ratingCount;
+              return avgA - avgB;
             },
           },
           {
@@ -174,28 +262,35 @@ const Article = () => {
             ),
           },
         ]}
+        pagination={{ pageSize: 10 }}
       />
 
       <Modal
         title={editingArticle ? "Edit Article" : "Add Article"}
         visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => { setIsModalVisible(false); setEditingArticle(null); form.resetFields(); if (editorRef.current) { editorRef.current.setContent(''); } }}
+        width={800}
         footer={null}
+        destroyOnClose
       >
-        <Form form={form} initialValues={editingArticle} onFinish={editingArticle ? handleSaveEdit : handleAdd}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={editingArticle ? handleSaveEdit : handleAdd}
+        >
           <Form.Item
             name="title"
             label="Article Title"
             rules={[{ required: true, message: 'Please input the article title!' }]}
           >
-            <Input />
+            <Input placeholder="Enter article title" />
           </Form.Item>
           <Form.Item
             name="author"
             label="Author"
             rules={[{ required: true, message: 'Please input the author!' }]}
           >
-            <Input />
+            <Input placeholder="Enter author name" />
           </Form.Item>
           <Form.Item
             name="category"
@@ -218,7 +313,7 @@ const Article = () => {
               label="Tags"
               rules={[{ required: true, message: 'Please select at least one tag!' }]}
             >
-              <Select mode="multiple"       style={{ width: '300px' }} placeholder="Select tags">
+              <Select mode="multiple" style={{ width: '100%' }} placeholder="Select tags">
                 {getTags(selectedCategory).map(tag => (
                   <Option key={tag} value={tag}>{tag}</Option>
                 ))}
@@ -226,38 +321,36 @@ const Article = () => {
             </Form.Item>
           )}
 
-          {/* Content Blocks */}
-          {contentBlocks.map((block, index) => (
-            <div key={index} style={{ marginBottom: '16px', border: '1px solid #ddd', padding: '16px', borderRadius: '4px' }}>
-              <Form.Item label="Block Type">
-                <Select
-                  value={block.type}
-                  onChange={(value) => handleBlockChange(index, 'type', value)}
-                >
-                  <Option value="paragraph">Paragraph</Option>
-                  <Option value="image">Image</Option>
-                  <Option value="quote">Quote</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item label={block.type === 'image' ? 'Image URL' : 'Content'}>
-                <Input
-                  value={block.content || block.src}
-                  onChange={(e) => handleBlockChange(index, block.type === 'image' ? 'src' : 'content', e.target.value)}
-                />
-              </Form.Item>
-              <Button type="danger" onClick={() => removeContentBlock(index)}>
-                Remove Block
-              </Button>
-            </div>
-          ))}
-          <Button type="dashed" onClick={addContentBlock} style={{ width: '100%', marginBottom: '16px' }}>
-            Add Content Block
-          </Button>
+          {/* TinyMCE Editor for Content */}
+          <Form.Item
+            label="Content"
+            required
+            rules={[{ required: true, message: 'Please enter the content!' }]}
+          >
+            <Editor
+              apiKey='r8bopxw2pat6ygctufal4fsmgfibwz7ycshko88au6n635zm' // Thay YOUR_TINYMCE_API_KEY bằng API key thực tế của bạn
+              onInit={(evt, editor) => editorRef.current = editor}
+              initialValue={editingArticle ? editingArticle.content : ''}
+              init={{
+                height: 400,
+                menubar: true,
+                plugins: [
+                  'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount'
+              ],
+              toolbar: 'undo redo | bold italic underline | link image media table | align left center right | removeformat'
+              }}
+            />
+          </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                {editingArticle ? "Update" : "Add"}
+              </Button>
+              <Button onClick={() => { setIsModalVisible(false); setEditingArticle(null); form.resetFields(); if (editorRef.current) { editorRef.current.setContent(''); } }}>
+                Cancel
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Modal>
@@ -266,6 +359,7 @@ const Article = () => {
 };
 
 export default Article;
+
 
 
 

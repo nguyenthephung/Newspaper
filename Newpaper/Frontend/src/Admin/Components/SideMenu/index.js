@@ -62,6 +62,11 @@ function SideMenu() {
             key: "/admin/tag",
             icon: <TagsOutlined />,
           },
+          {
+            label: "Reviews Writer Request",
+            key: "/admin/ReviewWriterRequests",
+            icon: <CheckCircleOutlined/>,
+          },
         
         ]}
       ></Menu>

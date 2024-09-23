@@ -1,65 +1,24 @@
+
+
+// // export default DailyCategory;
+
 // import React, { useState } from "react";
 // import Slider from "react-slick";
 // import { Link } from "react-router-dom";
+// import { useSelector } from "react-redux";
 // import Heading from "../../../../common/heading/Heading";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 // import "./DailyCategory.css";
 
-// // Dữ liệu mẫu
-// const popular = [
-//   {
-//     _id: "sampleId123",
-//     title: "Sample Article Title 1",
-//     content_blocks: [
-//       { type: "paragraph", content: "This is a sample paragraph." },
-//       { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-//       { type: "quote", content: "This is a sample quote." }
-//     ],
-//     author: "Sample Author 1",
-//     category: { name: "Sample Category 1" },
-//     totalRating: 10,
-//     ratingCount: 5,
-//     views: 150,
-//     createdAt: "2024-08-17T00:00:00Z"
-//   },
-//   {
-//     _id: "sampleId124",
-//     title: "Sample Article Title 2",
-//     content_blocks: [
-//       { type: "paragraph", content: "This is a sample paragraph." },
-//       { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-//       { type: "quote", content: "This is a sample quote." }
-//     ],
-//     author: "Sample Author 2",
-//     category: { name: "Sample Category 2" },
-//     totalRating: 20,
-//     ratingCount: 10,
-//     views: 250,
-//     createdAt: "2024-08-18T00:00:00Z"
-//   },
-//   {
-//     _id: "sampleId125",
-//     title: "Sample Article Title 3",
-//     content_blocks: [
-//       { type: "paragraph", content: "This is a sample paragraph." },
-//       { type: "image", src: "https://via.placeholder.com/150", alt: "Sample Image" },
-//       { type: "quote", content: "This is a sample quote." }
-//     ],
-//     author: "Sample Author 3",
-//     category: { name: "Sample Category 3" },
-//     totalRating: 30,
-//     ratingCount: 15,
-//     views: 300,
-//     createdAt: "2024-08-19T00:00:00Z"
-//   }
-// ];
-
 // const DailyCategory = () => {
 //   const [selectedDate, setSelectedDate] = useState(new Date());
 
+//   // Lấy dữ liệu articles từ Redux store
+//   const articles = useSelector((state) => state.article?.getArticle?.articles) || [];
+
 //   // Lọc dữ liệu theo ngày
-//   const filteredArticles = popular.filter((article) => {
+//   const filteredArticles = articles.filter((article) => {
 //     const articleDate = new Date(article.createdAt).toLocaleDateString();
 //     return articleDate === selectedDate.toLocaleDateString();
 //   });
@@ -68,7 +27,7 @@
 //     dots: true,
 //     infinite: true,
 //     speed: 500,
-//     slidesToShow: 1,
+//     slidesToShow: 2,
 //     slidesToScroll: 1,
 //   };
 
@@ -87,30 +46,35 @@
 //         <div className='content'>
 //           {filteredArticles.length > 0 ? (
 //             <Slider {...settings}>
-//               {filteredArticles.map((val) => (
-//                 <div className='items' key={val._id}>
-//                   <div className='box shadow'>
-//                     <div className='images'>
-//                       {val.content_blocks.map((block, index) =>
-//                         block.type === "image" ? (
-//                           <div className='img' key={index}>
-//                             <img src={block.src} alt={block.alt} />
+//               {filteredArticles.map((val) => {
+//                 // Lấy ảnh đầu tiên trong content_blocks
+//                 const firstImageBlock = val.content_blocks.find(block => block.type === "image");
+//                 const imageSrc = firstImageBlock ? firstImageBlock.src : null;
+//                 const imageAlt = firstImageBlock ? firstImageBlock.alt : "No Image";
+
+//                 return (
+//                   <div className='items' key={val._id}>
+//                     <div className='box shadow'>
+//                       <div className='images'>
+//                         {imageSrc && (
+//                           <div className='img'>
+//                             <img src={imageSrc} alt={imageAlt} />
 //                           </div>
-//                         ) : null
-//                       )}
-//                     </div>
-//                     <div className='text'>
-//                       <Link to={`/SinglePage/${val._id}`}>
-//                         <h1 className='title'>{val.title.slice(0, 40)}...</h1>
-//                       </Link>
-//                       <div className='date'>
-//                         <i className='fas fa-calendar-days'></i>
-//                         <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+//                         )}
+//                       </div>
+//                       <div className='text'>
+//                         <Link to={`/SinglePage/${val._id}`}>
+//                           <h1 className='title'>{val.title.slice(0, 40)}...</h1>
+//                         </Link>
+//                         <div className='date'>
+//                           <i className='fas fa-calendar-days'></i>
+//                           <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+//                         </div>
 //                       </div>
 //                     </div>
 //                   </div>
-//                 </div>
-//               ))}
+//                 );
+//               })}
 //             </Slider>
 //           ) : (
 //             <p>Không có bài báo nào cho ngày đã chọn.</p>
@@ -122,6 +86,7 @@
 // };
 
 // export default DailyCategory;
+// DailyCategory.jsx
 
 import React, { useState } from "react";
 import Slider from "react-slick";
@@ -131,6 +96,16 @@ import Heading from "../../../../common/heading/Heading";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DailyCategory.css";
+
+// Hàm trích xuất hình ảnh đầu tiên từ chuỗi HTML
+const extractFirstImage = (htmlContent) => {
+  if (typeof htmlContent !== 'string') return null;
+  const imgTagMatch = htmlContent.match(/<img[^>]+src="([^">]+)"/);
+  if (imgTagMatch && imgTagMatch[1]) {
+    return imgTagMatch[1].replace(/&amp;/g, '&'); // Thay thế &amp; thành &
+  }
+  return null;
+};
 
 const DailyCategory = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -152,6 +127,8 @@ const DailyCategory = () => {
     slidesToScroll: 1,
   };
 
+  const fallbackImage = "https://via.placeholder.com/400x300?text=No+Image+Available";
+
   return (
     <>
       <section className='dailyCategory'>
@@ -168,24 +145,45 @@ const DailyCategory = () => {
           {filteredArticles.length > 0 ? (
             <Slider {...settings}>
               {filteredArticles.map((val) => {
-                // Lấy ảnh đầu tiên trong content_blocks
-                const firstImageBlock = val.content_blocks.find(block => block.type === "image");
-                const imageSrc = firstImageBlock ? firstImageBlock.src : null;
-                const imageAlt = firstImageBlock ? firstImageBlock.alt : "No Image";
+                // Kiểm tra xem val.content có tồn tại và là một chuỗi hay không
+                if (!val.content || typeof val.content !== 'string') {
+                  return (
+                    <div className='items' key={val._id}>
+                      <div className='box shadow'>
+                        <div className='images'>
+                          <div className='img'>
+                            <img src={fallbackImage} alt="No Image Available" />
+                          </div>
+                        </div>
+                        <div className='text'>
+                          <Link to={`/SinglePage/${val._id}`}>
+                            <h1 className='title'>{val.title.slice(0, 40)}{val.title.length > 40 ? '...' : ''}</h1>
+                          </Link>
+                          <div className='date'>
+                            <i className='fas fa-calendar-days'></i>
+                            <label>{new Date(val.createdAt).toLocaleDateString()}</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Lấy ảnh đầu tiên trong content
+                const imageSrc = extractFirstImage(val.content) || fallbackImage;
+                const imageAlt = "Article cover"; // Bạn có thể tùy chỉnh alt nếu cần
 
                 return (
                   <div className='items' key={val._id}>
                     <div className='box shadow'>
                       <div className='images'>
-                        {imageSrc && (
-                          <div className='img'>
-                            <img src={imageSrc} alt={imageAlt} />
-                          </div>
-                        )}
+                        <div className='img'>
+                          <img src={imageSrc} alt={imageAlt} />
+                        </div>
                       </div>
                       <div className='text'>
                         <Link to={`/SinglePage/${val._id}`}>
-                          <h1 className='title'>{val.title.slice(0, 40)}...</h1>
+                          <h1 className='title'>{val.title.slice(0, 40)}{val.title.length > 40 ? '...' : ''}</h1>
                         </Link>
                         <div className='date'>
                           <i className='fas fa-calendar-days'></i>
